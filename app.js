@@ -11,19 +11,8 @@ var jwtauth = require('./jwtauth.js');
 
 //MARK: CONFIG
 mongoose.connect('mongodb://localhost/peatAPI');
-app.set('jwtTokenSecret', 'secretStringFTW');
+// app.set('jwtTokenSecret', 'secretStringFTW');
 
-
-// MARK: MODEL
-// var Schema = mongoose.Schema;
-// var ObjectId = Schema.ObjectId;
-// var User = mongoose.model('User', new Schema({
-// 	id: "ObjectId",
-// 	firstName: String,
-// 	lastName: String, 
-// 	email: { type: String, unique: true }, 
-// 	password: String, 
-// }));
 
 
 

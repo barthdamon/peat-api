@@ -63,15 +63,19 @@ module.exports = function(req, res, next) {
 					  	console.log(decoded);
 
 					  	//get user id from the db, check to make sure the exp isn't invalid
-					  	if (decoded.iss == user.id && decoded.exp >= moment()) {
-					  		// if token expired, send to refresh token function, which sends res informing client they need to basic auth
-					  		res.status(200).json({"message" : "Correct auth credentials"});
-					  	} else {
-					  		res.status(404).json({"message" : "Auth token invalid"});					  		
-					  	}
+					  	//redirect to login here??
+					  	if (decoded.exp < moment()) {res.status(300).json({"message" : "Auth Token Expired"})};
+					  	User.find({ id: decoded.iss }, function (err, user) {
+					  		if (user) {
+					  			res.status(200).json({"message" : "Correct auth credentials"});
+					  			//next();					  			
+					  		} else {
+								res.status(400).json({"message": "Token not matched to user"});					  			
+					  		}
+					  	});
 
 					} else {
-
+						res.status(400).json({"message" : "Invalid tokenAuth requst format"});
 					}
 				}
 				break;
