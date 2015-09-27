@@ -24,20 +24,20 @@ module.exports = function(req, res, next) {
 					  	try {
 				   		var decoded = jwt.decode(token, app.get('jwtTokenSecret'));
 					  	} catch (err) {
-					  		res.status(404).json({"message" : "Incorrect Auth Token: "+err});
+					  		res.status(401).json({"message" : "Incorrect Auth Token: "+err});
 					  	}
-					  	console.log(decoded);
+					  	// console.log(decoded);
 
 					  	// get user id from the db, check to make sure the exp isn't invalid
 					  	// redirect to login here??
 					  	if (decoded.exp < moment()) {res.status(300).json({"message" : "Auth Token Expired"})};
 					  	users.User.find({ _id: decoded.iss }, function (err, user) {
 					  		if (user) {
-					  			console.log(user);
-					  			req.user = user;		  			
+					  			// console.log(user);
+					  			req.user = user[0];		  			
 					  			next();					  			
 					  		} else {
-								res.status(400).json({"message": "Token not matched to user"});					  			
+								res.status(401).json({"message": "Token not matched to user"});					  			
 					  		}
 					  	});
 
@@ -54,6 +54,8 @@ module.exports = function(req, res, next) {
 				res.status(400).json({"message" : "Invalid auth type"});
 				break;
 		}
+	} else {
+		res.status(403).json({"message": "I'ma give you til the count of ten... To get your yella, dirty, no good keister off my property"});
 	}
 };
 
