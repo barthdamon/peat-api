@@ -17,7 +17,7 @@ exports.findUser = function (req) {
 	  	} catch (err) {
 	  		res.status(404).json({"message" : "Incorrect Auth Token: "+err});
 	  	}
-		if (decoded.exp < moment()) {res.status(300).json({"message" : "Auth Token Expired"})};
+		// if (decoded.exp < moment()) {res.status(300).json({"message" : "Auth Token Expired"})};
 	  	User.find({ _id: decoded.iss }, function (err, user) {
 	  		if (user) {
 	  			// console.log(user[0]);
@@ -34,9 +34,9 @@ exports.findUser = function (req) {
 exports.login = function(req, res) {
 	User.find({ email: req.body.params.user.email }, function(err, user) {
 		if (user) {
-			console.log(user);
+			// console.log(user);
 			var userID = user[0]['id'];
-			console.log(userID);
+			// console.log(userID);
 				if (req.body.params.user.password == user[0]['password']) {
 					var expires = moment().add(7, 'days').valueOf();
 					//encode using the jwt token secret

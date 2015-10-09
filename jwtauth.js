@@ -30,17 +30,19 @@ module.exports = function(req, res, next) {
 
 					  	// get user id from the db, check to make sure the exp isn't invalid
 					  	// redirect to login here??
-					  	if (decoded.exp < moment()) {res.status(300).json({"message" : "Auth Token Expired"})};
-					  	users.User.find({ _id: decoded.iss }, function (err, user) {
-					  		if (user) {
-					  			// console.log(user);
-					  			req.user = user[0];		  			
-					  			next();					  			
-					  		} else {
-								res.status(401).json({"message": "Token not matched to user"});					  			
-					  		}
-					  	});
-
+					  	// if (decoded.exp < moment()) {
+					  	// 	res.status(300).json({"message" : "Auth Token Expired"})
+					  	// } else {
+						  	users.User.find({ _id: decoded.iss }, function (err, user) {
+						  		if (user) {
+						  			console.log(user);
+						  			req.user = user[0];		  			
+						  			next();					  			
+						  		} else {
+									res.status(401).json({"message": "Token not matched to user"});					  			
+						  		}
+						  	});
+					  	// }
 					} else {
 						res.status(400).json({"message" : "Invalid tokenAuth request format"});
 					}

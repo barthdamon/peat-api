@@ -5,7 +5,7 @@ var moment = require('moment');
 
 // MARK: MODEL
 var mediaSchema = mongoose.Schema({
-	userID: String,
+	user: String,
 	mediaID: String,
 	mediaType: String,
 	timestamp: String
@@ -20,13 +20,13 @@ exports.postMedia = function(req, res) {
 	// console.log(req.user._id)
 	var currentTime = moment()
 	var postedMedia = new Media({
-		userID: req.user._id,
+		user: req.user.email,
 		mediaID: req.body.params.mediaInfo.mediaID,
 		mediaType: req.body.params.mediaInfo.mediaType,
 		timestamp: currentTime
 	});
 
-	postedMedia.save(function(err){
+	postedMedia.save(function(err) {
 		if(err){
 			res.status(400).json({ "message": "server media post failure: " + err });
 		} else {
@@ -36,9 +36,10 @@ exports.postMedia = function(req, res) {
 }
 
 exports.getMedia = function(req, res) {
-	Media.find({ email: req.user.email }, function(err, media) {
+	Media.find({ user: req.user.email }, function(err, media) {
 		if (media) {
-			res.status(200).json(media);
+			console.log(media);
+			res.status(200).json({ "media": media });
 		} else {
 			res.status(300).json({"message": "No Media for user found"});
 		}
