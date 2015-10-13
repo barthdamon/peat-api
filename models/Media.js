@@ -7,6 +7,7 @@ var moment = require('moment');
 var mediaSchema = mongoose.Schema({
 	user: String,
 	mediaID: String,
+	url: String,
 	mediaType: String,
 	timestamp: String
 });
@@ -22,6 +23,7 @@ exports.postMedia = function(req, res) {
 	var postedMedia = new Media({
 		user: req.user.email,
 		mediaID: req.body.params.mediaInfo.mediaID,
+		url: req.body.params.mediaInfo.url,
 		mediaType: req.body.params.mediaInfo.mediaType,
 		timestamp: currentTime
 	});
