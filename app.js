@@ -36,6 +36,9 @@ app.post('/', function(req, res) {
 app.post('/login', users.login);
 app.post('/media', media.postMedia);
 app.get('/media', media.getMedia);
+app.get('/users', users.getUsers);
+app.get('/friends', users.getFriends);
+app.put('/friends', users.putFriend);
 
 
 

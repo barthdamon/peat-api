@@ -35,7 +35,7 @@ module.exports = function(req, res, next) {
 					  	// } else {
 						  	users.User.find({ _id: decoded.iss }, function (err, user) {
 						  		if (user) {
-						  			console.log(user);
+						  			console.log(user[0]);
 						  			req.user = user[0];		  			
 						  			next();					  			
 						  		} else {
