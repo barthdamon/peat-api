@@ -1,7 +1,7 @@
 //MARK: GLOBAL DEPENDENCIES
 var express = require('express');
-mongoose = require('mongoose');
 app = express();
+mongoose = require('mongoose');
 
 //MARK: MODULES
 var bodyParser = require('body-parser');

@@ -78,14 +78,16 @@ exports.putFriend = function(req, res) {
 
 	User.find({ _id: req.user._id }, function(err, user) {
 		if (user) {
-
-			if (user.friends) {
-				updatedFriends = user.friends;
+			var foundUser = user[0]
+			console.log("USERTEST" + user)
+			console.log("USER: " + user.friends)
+			if (foundUser.friends) {
+				updatedFriends = foundUser.friends;
 				console.log("2");
 			}
 
 			updatedFriends.forEach(function(friend){
-				if (friend._id = newFrendId) {
+				if (friend._id = newFriendId) {
 					friendExists = true;
 					console.log("3");
 				}
@@ -122,15 +124,20 @@ exports.getFriends = function(req, res) {
 	var friends = req.user.friends;
 	var fetchedFriends = [];
 	friends.forEach(function(friend) {
-		User.find({ _id: friend._id}, function(err, user) {
-			if (user) {
-				fetchedFriends.append(user[0]);
+		User.find({ _id: friend}, function(err, user) {
+			if (err) {
+				console.log(err);
+				res.status(400).json({"message": "friends unable to be found"});
 			} else {
-				console.log("Error fetching user " + friend.name);
+				fetchedFriends.push(user[0]);
+				if (fetchedFriends.length > 0) {
+					res.status(200).json({"friends": fetchedFriends});
+				} else {
+					res.status(400).json({"message": "friends not there"});
+				}
 			}
 		});
 	});
-	res.status(200).json({"friends": fetchedFriends});
 }
 
 exports.getUsers = function(req, res) {
