@@ -123,21 +123,22 @@ exports.putFriend = function(req, res) {
 exports.getFriends = function(req, res) {
 	var friends = req.user.friends;
 	var fetchedFriends = [];
-	friends.forEach(function(friend) {
-		User.find({ _id: friend}, function(err, user) {
-			if (err) {
-				console.log(err);
-				res.status(400).json({"message": "friends unable to be found"});
+	User.find( { _id: { $in: friends }}, function(err, users) {
+		if (err) {
+			console.log(err);
+		} else {
+			fetchedFriends = users;
+			if (fetchedFriends.length > 0) {
+				res.status(200).json({"friends": fetchedFriends});
 			} else {
-				fetchedFriends.push(user[0]);
-				if (fetchedFriends.length > 0) {
-					res.status(200).json({"friends": fetchedFriends});
-				} else {
-					res.status(400).json({"message": "friends not there"});
-				}
+				res.status(400).json({"message": "YOU HAVE NO FRIENDS"});
 			}
-		});
+		}
 	});
+}
+
+exports.searchUsers = function(req,res) {
+	//first search usernames for what user has typed, then search names for what user has typed if the list is < 10
 }
 
 exports.getUsers = function(req, res) {
