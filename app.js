@@ -2,8 +2,6 @@
 var express = require('express');
 app = express();
 mongoose = require('mongoose');
-var Promise = require("bluebird");
-Promise.promisifyAll(require("mongoose"));
 
 //MARK: MODULES
 var bodyParser = require('body-parser');
@@ -38,7 +36,7 @@ app.post('/', function(req, res) {
 app.post('/login', users.login);
 app.post('/media', media.postMedia);
 app.get('/media', media.getMedia);
-app.get('/users', users.getUsers);
+app.post('/users/search', users.searchUsers);
 app.get('/friends', users.getFriends);
 app.put('/friends', users.putFriend);
 

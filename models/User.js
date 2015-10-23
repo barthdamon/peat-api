@@ -137,16 +137,14 @@ exports.getFriends = function(req, res) {
 	});
 }
 
-exports.searchUsers = function(req,res) {
-	//first search usernames for what user has typed, then search names for what user has typed if the list is < 10
-}
-
-exports.getUsers = function(req, res) {
-	User.find(function(err, users) {
+exports.searchUsers = function(req, res) {
+	var searchTerm = req.body.params.searchTerm
+	console.log("User Search Term: " +searchTerm);
+	User.find( {$or : [ {username: {$regex : searchTerm, $options: 'i'}}, {name: {$regex: searchTerm, $options: 'i'}} ] }, function(err, users) {
 		if (users) {
 			res.status(200).json({"users": users});
 		} else {
-			res.status(400).json({"mesage": "Error finding users"});
+			res.status(400).json({"message": "Error finding users"});
 		}
 	});
 }
