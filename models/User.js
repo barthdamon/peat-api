@@ -1,6 +1,5 @@
 //MARK: DEPENDENCIES
 var jwt = require('jwt-simple');
-var moment = require('moment');
 
 // MARK: MODEL
 var userSchema = mongoose.Schema({
@@ -23,7 +22,7 @@ exports.findUser = function (req) {
 	  	} catch (err) {
 	  		res.status(404).json({"message" : "Incorrect Auth Token: "+err});
 	  	}
-		// if (decoded.exp < moment()) {res.status(300).json({"message" : "Auth Token Expired"})};
+		// if (decoded.exp < Date.now()) {res.status(300).json({"message" : "Auth Token Expired"})};
 	  	User.find({ _id: decoded.iss }, function (err, user) {
 	  		if (user) {
 	  			// console.log(user[0]);
@@ -35,7 +34,7 @@ exports.findUser = function (req) {
 	} else {
 	res.status(400).json({"message" : "Invalid tokenAuth request format"});
 	}
-};
+}
 
 //MARK: Basic Auth
 
@@ -46,7 +45,8 @@ exports.login = function(req, res) {
 			var userID = user[0]['id'];
 			// console.log(userID);
 				if (req.body.params.user.password == user[0]['password']) {
-					var expires = moment().add(7, 'days').valueOf();
+					var date = Date.now()
+					var expires = date + 604800000;
 					//encode using the jwt token secret
 					var token = jwt.encode({
 					  	iss: userID,
@@ -138,7 +138,7 @@ exports.getFriends = function(req, res) {
 }
 
 exports.searchUsers = function(req, res) {
-	var searchTerm = req.body.params.searchTerm
+	var searchTerm = req.body.searchTerm
 	console.log("User Search Term: " +searchTerm);
 	User.find( {$or : [ {username: {$regex : searchTerm, $options: 'i'}}, {name: {$regex: searchTerm, $options: 'i'}} ] }, function(err, users) {
 		if (users) {

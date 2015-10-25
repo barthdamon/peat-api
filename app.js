@@ -7,7 +7,7 @@ mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 
 //MARK: CUSTOM DEPENDENCIES
-var jwtauth = require('./jwtauth.js');
+var jwtauth = require('./middleware/jwtauth.js');
 var users = require('./models/User.js');
 var media = require('./models/Media.js');
 
@@ -36,6 +36,8 @@ app.post('/', function(req, res) {
 app.post('/login', users.login);
 app.post('/media', media.postMedia);
 app.get('/media', media.getMedia);
+app.get('/media/update', media.getUpdate);
+app.get('/media/extend', media.extendNewsfeed);
 app.post('/users/search', users.searchUsers);
 app.get('/friends', users.getFriends);
 app.put('/friends', users.putFriend);

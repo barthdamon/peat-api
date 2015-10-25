@@ -1,9 +1,8 @@
 //MARK: DEPENDENCIES
 var API_AUTH_PASSWORD = "fartpoop";
-var moment = require('moment');
 var jwt = require('jwt-simple');
 var mongoose = require('mongoose');
-var users = require('./models/User.js');
+var users = require('./../models/User.js');
 // var config = require('./config.js');
 
 
@@ -30,7 +29,7 @@ module.exports = function(req, res, next) {
 
 					  	// get user id from the db, check to make sure the exp isn't invalid
 					  	// redirect to login here??
-					  	// if (decoded.exp < moment()) {
+					  	// if (decoded.exp < Date.now()) {
 					  	// 	res.status(300).json({"message" : "Auth Token Expired"})
 					  	// } else {
 						  	users.User.find({ _id: decoded.iss }, function (err, user) {
@@ -60,7 +59,3 @@ module.exports = function(req, res, next) {
 		res.status(403).json({"message": "I'ma give you til the count of ten... To get your yella, dirty, no good keister off my property"});
 	}
 };
-
-
-
-

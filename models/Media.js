@@ -1,6 +1,4 @@
 //MARK: DEPENDENCIES
-var moment = require('moment');
-
 
 
 // MARK: MODEL
@@ -9,7 +7,7 @@ var mediaSchema = mongoose.Schema({
 	mediaID: String,
 	url: String,
 	mediaType: String,
-	timestamp: String
+	timestamp: Number
 });
 
 var Media = mongoose.model('Media', mediaSchema);
@@ -19,7 +17,7 @@ var Media = mongoose.model('Media', mediaSchema);
 exports.postMedia = function(req, res) {
 	// console.log(req.body.params.mediaInfo.mediaID)
 	// console.log(req.user._id)
-	var currentTime = moment()
+	var currentTime = Date.now();
 	var postedMedia = new Media({
 		user: req.user.email,
 		mediaID: req.body.params.mediaInfo.mediaID,
@@ -38,12 +36,45 @@ exports.postMedia = function(req, res) {
 }
 
 exports.getMedia = function(req, res) {
-	Media.find({ user: req.user.email }, function(err, media) {
-		if (media) {
-			console.log(media);
-			res.status(200).json({ "media": media });
+	//TODO: Add more here to return just the most recent 5 or so. Then in extend make that a post and send down the next most recent 5
+	Media.find({ user: req.user.email }).limit(5, function(err, media) {
+		if (err) {
+			res.status(400).json({"message": "Error finding media"});
 		} else {
-			res.status(300).json({"message": "No Media for user found"});
+			if (media) {
+				console.log(media);
+				res.status(200).json({ "media": media });
+			} else {
+				res.status(204).json({"message": "No Media for user found"});
+			}
+		}
+	});
+}
+
+exports.getUpdate = function(req, res) {
+	var lastUpdated = req.body.mostRecent;
+	Media.find({timestamp: {$gt: lastUpdated} }).limit(5).exec(function(err, media) {
+		if (err) {
+			res.status(400).json({"message": "Error fetching media update"});
+		} else if (media.length > 0) {
+			console.log(media);
+			res.status(200).json({"media": media});
+		} else {
+			res.status(204).json({"message": "No updates found"});
+		}
+	});
+}
+
+exports.extendNewsfeed = function(req, res) {
+	var lastRecieved = req.body.lastRecieved;
+	Media.find({timestamp: {$lt: lastRecieved} }).sort({timestamp: 1}).limit(5).exec(function(err, media) {
+		if (err) {
+			res.status(400).json({"message": "Error fetching media for newsfeed extension"});
+		} else if (media.length >0) {
+			console.log(media);
+			res.status(200).json({"media": media});
+		} else {
+				res.status(204).json({"message": "No updates found"});
 		}
 	});
 }
