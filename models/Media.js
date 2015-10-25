@@ -37,23 +37,22 @@ exports.postMedia = function(req, res) {
 
 exports.getMedia = function(req, res) {
 	//TODO: Add more here to return just the most recent 5 or so. Then in extend make that a post and send down the next most recent 5
-	Media.find({ user: req.user.email }).limit(5, function(err, media) {
+	Media.find({ user: req.user.email }).sort({timestamp: -1}).limit(5).exec(function(err, media) {
 		if (err) {
 			res.status(400).json({"message": "Error finding media"});
+		} else if (media) {
+			console.log(media);
+			res.status(200).json({ "media": media });
 		} else {
-			if (media) {
-				console.log(media);
-				res.status(200).json({ "media": media });
-			} else {
-				res.status(204).json({"message": "No Media for user found"});
-			}
+			res.status(204).json({"message": "No Media for user found"});
 		}
 	});
 }
 
 exports.getUpdate = function(req, res) {
 	var lastUpdated = req.body.mostRecent;
-	Media.find({timestamp: {$gt: lastUpdated} }).limit(5).exec(function(err, media) {
+	console.log("LAST UPDATED:" +lastUpdated);
+	Media.find({timestamp: {$gt: lastUpdated} }).sort({timestamp: -1}).limit(5).exec(function(err, media) {
 		if (err) {
 			res.status(400).json({"message": "Error fetching media update"});
 		} else if (media.length > 0) {
@@ -67,7 +66,7 @@ exports.getUpdate = function(req, res) {
 
 exports.extendNewsfeed = function(req, res) {
 	var lastRecieved = req.body.lastRecieved;
-	Media.find({timestamp: {$lt: lastRecieved} }).sort({timestamp: 1}).limit(5).exec(function(err, media) {
+	Media.find({timestamp: {$lt: lastRecieved} }).sort({timestamp: -1}).limit(5).exec(function(err, media) {
 		if (err) {
 			res.status(400).json({"message": "Error fetching media for newsfeed extension"});
 		} else if (media.length >0) {

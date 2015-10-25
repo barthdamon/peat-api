@@ -32,15 +32,17 @@ app.post('/', function(req, res) {
 	res.status(200).json({"message":"Server Online"});
 });
 
-
+//User
 app.post('/login', users.login);
-app.post('/media', media.postMedia);
-app.get('/media', media.getMedia);
-app.get('/media/update', media.getUpdate);
-app.get('/media/extend', media.extendNewsfeed);
 app.post('/users/search', users.searchUsers);
 app.get('/friends', users.getFriends);
 app.put('/friends', users.putFriend);
+//Media
+app.post('/media', media.postMedia);
+app.get('/media', media.getMedia);
+app.post('/media/update', media.getUpdate);
+app.post('/media/extend', media.extendNewsfeed);
+
 
 
 
