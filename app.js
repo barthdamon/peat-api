@@ -10,6 +10,7 @@ var bodyParser = require('body-parser');
 var jwtauth = require('./middleware/jwtauth.js');
 var users = require('./models/User.js');
 var media = require('./models/Media.js');
+var leaf = require('./models/Leaf.js');
 
 
 //MARK: CONFIG
@@ -42,6 +43,9 @@ app.post('/media', media.postMedia);
 app.get('/media', media.getMedia);
 app.post('/media/update', media.getUpdate);
 app.post('/media/extend', media.extendNewsfeed);
+//Tree
+app.post('/leaves', leaf.createLeaf);
+app.post('/leaves/get', leaf.getLeaves);
 
 
 

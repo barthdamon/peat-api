@@ -15,8 +15,8 @@ var Media = mongoose.model('Media', mediaSchema);
 
 
 exports.postMedia = function(req, res) {
-	// console.log(req.body.params.mediaInfo.mediaID)
-	// console.log(req.user._id)
+	console.log(req.body.params.mediaInfo.mediaID)
+	console.log(req.user._id)
 	var currentTime = Date.now();
 	var postedMedia = new Media({
 		user: req.user.email,
