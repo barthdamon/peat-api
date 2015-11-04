@@ -17,8 +17,6 @@ var leaf = require('./models/Leaf.js');
 app.set('jwtTokenSecret', 'secretStringFTW');
 mongoose.connect('mongodb://localhost/peatAPI');
 
-
-
 //MARK: MIDDLEWARE
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
