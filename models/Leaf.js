@@ -6,20 +6,21 @@ var leafSchema = mongoose.Schema({
 		y: Number
 	},
 	activity: String,
-	connections: [String],
+	connections: []
 });
 
 var Leaf = mongoose.model('Leaf', leafSchema);
 
 exports.createLeaf = function(req, res) {
+	console.log(req.body.params.leafLa)
 	var postedLeaf = new Leaf({
 		user: req.user.email,
 		coordinates: {
-			x: req.body.params.leafLayout.coordinates.x,
-			y: req.body.params.leafLayout.coordinates.y
+			x: req.body.params.coordinates.x,
+			y: req.body.params.coordinates.y
 		},
 		activity: req.body.params.activity,
-		connections: req.body.params.leafLayout.connections
+		connections: req.body.params.connections
 	});
 
 	postedLeaf.save(function(err) {
@@ -42,7 +43,7 @@ exports.getLeaves = function(req, res) {
 			console.log(leaves);
 			res.status(200).json({"leaves": leaves});
 		} else {
-			res.status(204).json({"message": "No updates found"});
+			res.status(204).json({"message": "No leaves found"});
 		}
 	});
 }
