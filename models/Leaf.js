@@ -1,4 +1,7 @@
 // MARK: MODEL
+/* NOTE: all connections are PREVIOUS connections to nodes above the node. 
+That way when a node is incomplete the connections can just be gray */
+
 var leafSchema = mongoose.Schema({
 	user: String,
 	coordinates: {
@@ -6,19 +9,22 @@ var leafSchema = mongoose.Schema({
 		y: Number
 	},
 	activity: String,
+	abilityTitle: String,
+	completionStatus: Boolean,
 	connections: []
 });
 
 var Leaf = mongoose.model('Leaf', leafSchema);
 
 exports.createLeaf = function(req, res) {
-	console.log(req.body.params.leafLa)
 	var postedLeaf = new Leaf({
 		user: req.user.email,
 		coordinates: {
 			x: req.body.params.coordinates.x,
 			y: req.body.params.coordinates.y
 		},
+		abilityTitle: req.body.params.abilityTitle,
+		completionStatus: req.body.params.completionStatus,
 		activity: req.body.params.activity,
 		connections: req.body.params.connections
 	});
