@@ -4,14 +4,16 @@ That way when a node is incomplete the connections can just be gray */
 
 var leafSchema = mongoose.Schema({
 	user: String,
+	media: [String],
 	coordinates: {
 		x: Number,
 		y: Number
 	},
+	media: [{ type: String, ref: 'Media' }],
 	activity: String,
 	abilityTitle: String,
 	completionStatus: Boolean,
-	connections: []
+	connections: [String]
 });
 
 var Leaf = mongoose.model('Leaf', leafSchema);
@@ -39,7 +41,7 @@ exports.createLeaf = function(req, res) {
 }
 
 exports.getLeaves = function(req, res) {
-	var activity = req.body.activity
+	var activity = req.body.activity;
 	console.log("ACTIVITY: " +activity);
 	Leaf.find({activity: activity, user: req.user.email }, function(err, leaves) {
 		if (err) {
@@ -52,4 +54,24 @@ exports.getLeaves = function(req, res) {
 			res.status(204).json({"message": "No leaves found"});
 		}
 	});
+}
+
+
+exports.putMediaOnLeaf = function(req, res) {
+	var media = req.body.media;
+	var leaf = req.body.leaf;
+	var mediaId = media.id;
+	//create leaf then update the tree I guess
+	if (mediaId) {
+		Leaf.update({ '_id' : req.user._id }, { $addToSet : { 'friends': newFriendId } }, function (err, result) {
+			if (err) {
+			res.status(400).json({"message": "Error occured while adding friend"});
+			} else {
+				console.log(result);
+				res.status(200).json({"message": "Friend Added"});
+			}
+	   });
+   } else {
+   	res.status(400).json({"message": "Could not parse friend to add"});
+   }	
 }

@@ -1,7 +1,9 @@
-//MARK: GLOBAL DEPENDENCIES
+   //MARK: GLOBAL DEPENDENCIES
 var express = require('express');
 app = express();
 mongoose = require('mongoose');
+var server = require('http').createServer(app);
+var io = require('socket.io')(server);
 
 //MARK: MODULES
 var bodyParser = require('body-parser');
@@ -46,25 +48,16 @@ app.post('/leaves', leaf.createLeaf);
 app.post('/leaves/get', leaf.getLeaves);
 
 
-
-
-app.get('/fart', function(req, res) {
- res.writeHead(200, {"Content-Type": "application/json"});
- // var userObj = req.get('user');
- var userObj = req.user;
- console.log(userObj);
- // var authedUser = userObj[0]['email'];
-
-  var otherArray = ["item1", "item2"];
-  var otherObject = { item1: "item1val", item2: "item2val" };
-  var json = JSON.stringify({ 
-    anObject: otherObject, 
-    anArray: otherArray, 
-    USER: userObj
+//MARK: SOCKET CONNECTIONS
+io.on('connection', function(socket){
+  console.log("Connected With Client");
+  socket.on('message', function(data){
+    console.log("message recieved: " + JSON.stringify(data));
   });
-
-  res.end(json);
-
+  socket.on('disconect', function(){
+    console.log("Client disconnected");
+  })
 });
 
+server.listen(8080);
 app.listen(3000);

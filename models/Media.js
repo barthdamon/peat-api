@@ -41,7 +41,7 @@ exports.getMedia = function(req, res) {
 		if (err) {
 			res.status(400).json({"message": "Error finding media"});
 		} else if (media) {
-			console.log(media);
+			// console.log(media);
 			res.status(200).json({ "media": media });
 		} else {
 			res.status(204).json({"message": "No Media for user found"});
@@ -56,7 +56,7 @@ exports.getUpdate = function(req, res) {
 		if (err) {
 			res.status(400).json({"message": "Error fetching media update"});
 		} else if (media.length > 0) {
-			console.log(media);
+			// console.log(media);
 			res.status(200).json({"media": media});
 		} else {
 			res.status(204).json({"message": "No updates found"});
@@ -70,7 +70,7 @@ exports.extendNewsfeed = function(req, res) {
 		if (err) {
 			res.status(400).json({"message": "Error fetching media for newsfeed extension"});
 		} else if (media.length >0) {
-			console.log(media);
+			// console.log(media);
 			res.status(200).json({"media": media});
 		} else {
 				res.status(204).json({"message": "No updates found"});

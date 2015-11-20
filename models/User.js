@@ -71,53 +71,23 @@ exports.login = function(req, res) {
 
 exports.putFriend = function(req, res) {
 	//find the user in the db and then add the friend sent to that users array of friends
-	var newFriendId = req.body.params.friend;
+	var newFriendId = req.body.friend;
 	var updatedFriends = [];
 	var friendExists = false;
 	console.log("1");
 
-	User.find({ _id: req.user._id }, function(err, user) {
-		if (user) {
-			var foundUser = user[0]
-			console.log("USERTEST" + user)
-			console.log("USER: " + user.friends)
-			if (foundUser.friends) {
-				updatedFriends = foundUser.friends;
-				console.log("2");
-			}
-
-			updatedFriends.forEach(function(friend){
-				if (friend._id = newFriendId) {
-					friendExists = true;
-					console.log("3");
-				}
-				console.log("3.5");
-			});
-
-			if (!friendExists) {
-				updatedFriends.push(newFriendId);
-				console.log(newFriendId);
-				console.log(updatedFriends);
-				console.log("4");
-
-				User.update(
-				   { '_id' : req.user._id }, 
-				   { $set: { 'friends': updatedFriends } },
-				   function (err, result) {
-		    			if (err) {
-							res.status(400).json({"message": "Error occured while adding friend"});
-		    			} else {
-		    				console.log(result);
-		    				res.status(200).json({"message": "Friend Added"});
-		    			}
-				   });			
+	if (newFriendId) {
+		User.update({ '_id' : req.user._id }, { $addToSet : { 'friends': newFriendId } }, function (err, result) {
+			if (err) {
+			res.status(400).json({"message": "Error occured while adding friend"});
 			} else {
-				res.status(400).json({"message": "Friend already exists"});				
+				console.log(result);
+				res.status(200).json({"message": "Friend Added"});
 			}
-		} else {
-			res.status(400).json({"message": "Friend Not found"});
-		}
-	});
+	   });
+   } else {
+   	res.status(400).json({"message": "Could not parse friend to add"});
+   }			
 }
 
 exports.getFriends = function(req, res) {
