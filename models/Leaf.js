@@ -18,6 +18,24 @@ var leafSchema = mongoose.Schema({
 
 var Leaf = mongoose.model('Leaf', leafSchema);
 
+exports.putMediaOnLeaf = function(media, res) {
+	var leafId = media.leaf;
+	console.log("MEDIA: " + media);
+	var mediaId = media._id
+	if (leafId) {
+		Leaf.update({ '_id' : leafId }, { $addToSet : { 'media': mediaId } }, function (err, result) {
+			if (err) {
+				res.status(400).json({"message": "Error occured while adding media to leaf"});
+			} else {
+				console.log(result);
+				res.status(200).json({"message": "media Added to leaf"});
+			}
+	   });
+   } else {
+   	res.status(400).json({"message": "Could not add media to leaf"});
+   }	
+}
+
 exports.createLeaf = function(req, res) {
 	var postedLeaf = new Leaf({
 		user: req.user.email,
@@ -54,24 +72,4 @@ exports.getLeaves = function(req, res) {
 			res.status(204).json({"message": "No leaves found"});
 		}
 	});
-}
-
-
-exports.putMediaOnLeaf = function(req, res) {
-	var media = req.body.media;
-	var leaf = req.body.leaf;
-	var mediaId = media.id;
-	//create leaf then update the tree I guess
-	if (mediaId) {
-		Leaf.update({ '_id' : req.user._id }, { $addToSet : { 'friends': newFriendId } }, function (err, result) {
-			if (err) {
-			res.status(400).json({"message": "Error occured while adding friend"});
-			} else {
-				console.log(result);
-				res.status(200).json({"message": "Friend Added"});
-			}
-	   });
-   } else {
-   	res.status(400).json({"message": "Could not parse friend to add"});
-   }	
 }

@@ -1,17 +1,36 @@
 
-var messageSchema = mongoose.Schema({
+var threadSchema = mongoose.Schema({
 	sender: String,
 	recipient: String,
 	media: [String],
-	coordinates: {
-		x: Number,
-		y: Number
-	},
-	media: [{ type: String, ref: 'Media' }],
-	activity: String,
-	abilityTitle: String,
-	completionStatus: Boolean,
-	connections: [String]
+	request: Boolean,
+	text: String,
+	history: [{ type: String, ref: 'Thread' }]
 });
 
-var Message = mongoose.model('Message', messageSchema);
+var Thread = mongoose.model('Thread', messageSchema);
+
+exports.createMessage = function(thread) {
+		var newThread = new Thread({
+		sender: thread.sender,
+		recipient: thread.recipient,
+		media: thread.media,
+		request: thread.request,
+		text: thread.text,
+		history: thread.history
+	});
+
+	newMessage.save(function(err) {
+		if (err) {
+			res.status(400).json({ "message": "thread create failure: " + err });
+		} else {
+			res.status(200).json({ "message": "thread create success" });
+		}
+	});
+}
+
+exports.recieveMessage = function(thread) {
+	
+
+
+}

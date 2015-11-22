@@ -49,15 +49,16 @@ app.post('/leaves/get', leaf.getLeaves);
 
 
 //MARK: SOCKET CONNECTIONS
-io.on('connection', function(socket){
-  console.log("Connected With Client");
-  socket.on('message', function(data){
-    console.log("message recieved: " + JSON.stringify(data));
-  });
-  socket.on('disconect', function(){
-    console.log("Client disconnected");
-  })
-});
+// io.on('connection', function(socket){
+//   console.log("Connected With Client");
+//   socket.on('message', function(data){
+//     console.log("message recieved: " + JSON.stringify(data));
+//   });
 
-server.listen(8080);
+//   socket.on('disconect', function(){
+//     console.log("Client disconnected");
+//   });
+// });
+
+// server.listen(8080);
 app.listen(3000);
