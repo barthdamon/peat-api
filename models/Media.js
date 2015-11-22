@@ -1,5 +1,7 @@
 //MARK: DEPENDENCIES
+var Promise = require('bluebird');
 var Leaf = require('./Leaf.js');
+var Comment = require('./Comment.js');
 
 // MARK: MODEL
 var mediaSchema = mongoose.Schema({
@@ -8,13 +10,14 @@ var mediaSchema = mongoose.Schema({
 	url: String,
 	mediaType: String,
 	timestamp: Number,
-	leaf: String
+	leaf: String,
+	comments: [String]
 });
 
 var Media = mongoose.model('Media', mediaSchema);
 
 exports.postMedia = function(req, res) {
-	console.log(req.body.params.mediaInfo.mediaID)
+	console.log(req.body.params.mediaInfo.mediaID);
 	// console.log(req.user._id)
 	var currentTime = Date.now();
 	var postedMedia = new Media({
@@ -23,7 +26,8 @@ exports.postMedia = function(req, res) {
 		url: req.body.params.mediaInfo.url,
 		mediaType: req.body.params.mediaInfo.mediaType,
 		timestamp: currentTime,
-		leaf: req.body.params.leaf
+		leaf: req.body.params.leaf,
+		comments: req.body.params.comments
 	});
 
 	postedMedia.save(function(err) {
@@ -42,7 +46,9 @@ exports.getMedia = function(req, res) {
 			res.status(400).json({"message": "Error finding media"});
 		} else if (media) {
 			// console.log(media);
-			res.status(200).json({ "media": media });
+			Comment.fetchComments(media).then(function(comments) {
+				res.status(200).json({ "media": media, "included" : comments });
+			});
 		} else {
 			res.status(204).json({"message": "No Media for user found"});
 		}
