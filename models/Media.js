@@ -6,12 +6,18 @@ var Comment = require('./Comment.js');
 // MARK: MODEL
 var mediaSchema = mongoose.Schema({
 	user: String,
-	mediaID: String,
-	url: String,
-	mediaType: String,
-	timestamp: Number,
+	mediaInfo: {
+		mediaID: String,
+		url: String,
+		mediaType: String,
+	},
 	leaf: String,
-	comments: [String]
+	comments: [String],
+	meta: {
+		timestamp: Number,
+		leafPath: String,
+		description: String,
+	}
 });
 
 var Media = mongoose.model('Media', mediaSchema);
@@ -22,12 +28,18 @@ exports.postMedia = function(req, res) {
 	var currentTime = Date.now();
 	var postedMedia = new Media({
 		user: req.user.email,
-		mediaID: req.body.params.mediaInfo.mediaID,
-		url: req.body.params.mediaInfo.url,
-		mediaType: req.body.params.mediaInfo.mediaType,
-		timestamp: currentTime,
+		mediaInfo: {
+			mediaID: req.body.params.mediaInfo.mediaID,
+			url: req.body.params.mediaInfo.url,
+			mediaType: req.body.params.mediaInfo.mediaType,
+		},
 		leaf: req.body.params.leaf,
-		comments: req.body.params.comments
+		comments: req.body.params.comments,
+		meta: {
+			timestamp: currentTime,
+			leafPath: req.body.params.meta.leafPath,
+			description: req.body.params.meta.description,
+		}		
 	});
 
 	postedMedia.save(function(err) {

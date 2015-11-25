@@ -33,7 +33,7 @@ exports.putMediaOnLeaf = function(media, res) {
 	   });
    } else {
    	res.status(400).json({"message": "Could not add media to leaf"});
-   }	
+   }
 }
 
 exports.createLeaf = function(req, res) {
@@ -57,6 +57,8 @@ exports.createLeaf = function(req, res) {
 		}
 	});
 }
+
+
 
 exports.getLeaves = function(req, res) {
 	var activity = req.body.activity;

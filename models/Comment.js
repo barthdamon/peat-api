@@ -5,16 +5,19 @@ var commentSchema = mongoose.Schema({
 	media: [String],
 	witnessEvent: Boolean,
 	text: String,
+	timestamp: Number
 });
 
 var Comment = mongoose.model('Comment', commentSchema);
 
 exports.createMessage = function(req, res) {
-		var newComment = new Comment({
+	var currentTime = Date.now();
+	var newComment = new Comment({
 		sender: req.body.params.sender,
 		media: req.body.params.media,
 		witnessEvent: req.body.params.witnessEvent,
 		text: req.body.params.text,
+		timestamp: currentTime
 	});
 
 	newComment.save(function(err) {
