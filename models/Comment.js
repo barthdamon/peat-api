@@ -29,7 +29,7 @@ exports.createMessage = function(req, res) {
 	});
 }
 
-//returns a list of comments to the getmedia function
+//MARK: LOCAL
 exports.fetchComments = function(media) {
 	var mediaId = media._id;
 	return new Promise(function(resolve, reject){

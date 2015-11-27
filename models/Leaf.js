@@ -1,6 +1,7 @@
 // MARK: MODEL
 /* NOTE: all connections are PREVIOUS connections to nodes above the node. 
 That way when a node is incomplete the connections can just be gray */
+var Media = require("./Media.js");
 
 var leafSchema = mongoose.Schema({
 	user: String,
@@ -58,8 +59,6 @@ exports.createLeaf = function(req, res) {
 	});
 }
 
-
-
 exports.getLeaves = function(req, res) {
 	var activity = req.body.activity;
 	console.log("ACTIVITY: " +activity);
@@ -68,8 +67,9 @@ exports.getLeaves = function(req, res) {
 			console.log("ERROR: "+err);
 			res.status(400).json({"message": "Error featching leaves"});
 		} else if (leaves.length > 0) {
-			console.log(leaves);
-			res.status(200).json({"leaves": leaves});
+			Media.fetchMediaForLeaves(leaves).then(function(media) {
+				res.status(200).json({ "leaves": leaves, "included" : media });
+			});
 		} else {
 			res.status(204).json({"message": "No leaves found"});
 		}
