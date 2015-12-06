@@ -5,7 +5,7 @@
 var threadSchema = mongoose.Schema({
 	sender: String,
 	recipient: String,
-	media: [String],
+	media: String,
 	notification: Boolean,
 	request: Boolean,
 	text: String,
