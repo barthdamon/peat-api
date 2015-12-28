@@ -1,23 +1,12 @@
-// MARK: MODEL
+'use strict';
+
 /* NOTE: all connections are PREVIOUS connections to nodes above the node. 
 That way when a node is incomplete the connections can just be gray */
+let express = require('express');
+let app = express();
+
+var Leaf = require('../models/LeafSchema.js');
 var Media = require("./Media.js");
-
-var leafSchema = mongoose.Schema({
-	user: String,
-	media: [String],
-	coordinates: {
-		x: Number,
-		y: Number
-	},
-	media: [{ type: String, ref: 'Media' }],
-	activity: String,
-	abilityTitle: String,
-	completionStatus: Boolean,
-	connections: [String]
-});
-
-var Leaf = mongoose.model('Leaf', leafSchema);
 
 exports.putMediaOnLeaf = function(media, res) {
 	var leafId = media.leaf;
@@ -67,8 +56,8 @@ exports.getLeaves = function(req, res) {
 			console.log("ERROR: "+err);
 			res.status(400).json({"message": "Error featching leaves"});
 		} else if (leaves.length > 0) {
-			Media.fetchMediaForLeaves(leaves).then(function(media) {
-				res.status(200).json({ "leaves": leaves, "included" : media });
+			Media.fetchMediaForLeaves(leaves).then(function(mediaInfo) {
+				res.status(200).json({ "leaves": leaves, "mediaInfo" : mediaInfo });
 			});
 		} else {
 			res.status(204).json({"message": "No leaves found"});

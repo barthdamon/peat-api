@@ -1,18 +1,12 @@
+'use strict';
+
 //MARK: DEPENDENCIES
+let express = require('express');
+let app = express();
+var mongoose = require('mongoose');
 var jwt = require('jwt-simple');
 
-// MARK: MODEL
-var userSchema = mongoose.Schema({
-	name: String,
-	userName: { type: String, unique: true},
-	email: { type: String, unique: true }, 
-	password: String,
-	friends: [String]
-});
-
-var User = mongoose.model('User', userSchema);
-
-//MARK: Utility
+var User = require('../models/UserSchema.js');
 
 exports.findUser = function (req) {
 	var token = req.get('token');
@@ -36,9 +30,32 @@ exports.findUser = function (req) {
 	}
 }
 
-//MARK: Basic Auth
+//MARK: New
+exports.createUser = function(req, res) {
+	let name = req.body.params.user.name;
+	let username = req.body.params.user.username;
+	let email = req.body.params.user.email;
+	let password = req.body.params.user.password;
+	let newUser = new User({
+		name: name,
+		userName: username,
+		email: email, 
+		password: password,
+		friends: []
+	});
 
+	newUser.save(function(err) {
+		if (err) {
+			res.status(400).json({ "message": "user create failure: " + err });
+		} else {
+			res.status(200).json({ "message": "user create success" });
+		}
+	});
+}
+
+//MARK: Basic Auth
 exports.login = function(req, res) {
+	console.log(req.body.params.user.email);
 	User.find({ email: req.body.params.user.email }, function(err, user) {
 		if (user) {
 			// console.log(user);
@@ -68,7 +85,6 @@ exports.login = function(req, res) {
 }
 
 //MARK: Friends
-
 exports.putFriend = function(req, res) {
 	//find the user in the db and then add the friend sent to that users array of friends
 	var newFriendId = req.body.friend;

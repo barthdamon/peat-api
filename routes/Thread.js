@@ -1,20 +1,10 @@
+'use strict';
 
 //emit notifications needs to be called whenever the thread is updated. That way the socket can work with whatever it has to send out to?
+let express = require('express');
+let app = express();
 
-//recieved here is a string for the last recieved message in the thread history
-var threadSchema = mongoose.Schema({
-	sender: String,
-	recipient: String,
-	media: String,
-	notification: Boolean,
-	request: Boolean,
-	text: String,
-	recieved: String
-	history: [{ type: String, ref: 'Thread' }],
-	timestamp: Number,
-});
-
-var Thread = mongoose.model('Thread', messageSchema);
+var Thread = require('../models/ThreadSchema.js');
 
 exports.createMessage = function(thread) {
 	var currentTime = Date.now();
@@ -39,7 +29,7 @@ exports.createMessage = function(thread) {
 }
 
 exports.messageRecieved = function(thread) {
-
+	
 }
 
 exports.emitNotifications = function() {

@@ -1,17 +1,26 @@
-//MARK: DEPENDENCIES
-var API_AUTH_PASSWORD = "fartpoop";
-var jwt = require('jwt-simple');
-var mongoose = require('mongoose');
-var users = require('./../models/User.js');
-// var config = require('./config.js');
+'use strict';
 
+//MARK: DEPENDENCIES
+let express = require('express');
+let app = express();
+var jwt = require('jwt-simple');
+
+let API_AUTH_PASSWORD = process.env.API_PASSWORD;
+var users = require('./../models/UserSchema.js');
 
 //MARK: EXPORTS
 module.exports = function(req, res, next) {
+	console.log("hitting jtw auth");
 	if (req.get('api_auth_password') == API_AUTH_PASSWORD) {
 		switch (req.get('auth_type')) {
 
+			case "New":
+				//check to make sure its going to create users, throw error if not
+				next();
+				break;
+
 			case "Basic":
+				console.log("BASIC AUTH");
 				next();
 				break;
 
@@ -19,13 +28,14 @@ module.exports = function(req, res, next) {
 				if (req.get('api_auth_password') == API_AUTH_PASSWORD) {
 					//query the db for the jwt that matches the user
 					var token = req.get('token');
+					var decoded = null;
 					if (token) {
 					  	try {
-				   		var decoded = jwt.decode(token, app.get('jwtTokenSecret'));
+				   		decoded = jwt.decode(token, app.get('jwtTokenSecret'));
 					  	} catch (err) {
 					  		res.status(401).json({"message" : "Incorrect Auth Token: "+err});
 					  	}
-					  	// console.log(decoded);
+					  	console.log(decoded);
 
 					  	// get user id from the db, check to make sure the exp isn't invalid
 					  	// redirect to login here??

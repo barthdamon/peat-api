@@ -1,29 +1,28 @@
-   //MARK: GLOBAL DEPENDENCIES
-var express = require('express');
-app = express();
-mongoose = require('mongoose');
+'use strict';
+
+let express = require('express');
+let app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 
-//MARK: MODULES
-var bodyParser = require('body-parser');
-
-//MARK: CUSTOM DEPENDENCIES
-var jwtauth = require('./middleware/jwtauth.js');
-var users = require('./models/User.js');
-var media = require('./models/Media.js');
-var leaf = require('./models/Leaf.js');
-
-
 //MARK: CONFIG
+//TODO add switch for heroku secret token
 app.set('jwtTokenSecret', 'secretStringFTW');
-mongoose.connect('mongodb://localhost/peatAPI');
+app.set('port', (process.env.PORT || 3000));
 
 //MARK: MIDDLEWARE
+var bodyParser = require('body-parser');
+var jwtauth = require('./middleware/jwtauth.js');
+var standardLogs = require('./middleware/standardLogs.js');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(standardLogs);
 app.use(jwtauth);
 
+//MARK: Models
+var users = require('./routes/User.js');
+var media = require('./routes/Media.js');
+var leaf = require('./routes/Leaf.js');
 
 //MARK: ROUTES
 app.get('/', function(req, res) {
@@ -34,6 +33,7 @@ app.post('/', function(req, res) {
 });
 
 //User
+app.post('/new', users.createUser);
 app.post('/login', users.login);
 app.post('/users/search', users.searchUsers);
 app.get('/friends', users.getFriends);
@@ -60,5 +60,7 @@ app.post('/leaves/get', leaf.getLeaves);
 //   });
 // });
 
-// server.listen(8080);
-app.listen(3000);
+app.listen(app.get('port'), function() {
+  console.log('Node app is running on port', app.get('port'));
+});
+

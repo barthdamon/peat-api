@@ -1,14 +1,10 @@
+'use strict';
+
+let express = require('express');
+let app = express();
 var Promise = require('bluebird');
 
-var commentSchema = mongoose.Schema({
-	sender: String,
-	media: [String],
-	witnessEvent: Boolean,
-	text: String,
-	timestamp: Number
-});
-
-var Comment = mongoose.model('Comment', commentSchema);
+var Comment = require('../models/CommentSchema.js');
 
 exports.createMessage = function(req, res) {
 	var currentTime = Date.now();
@@ -39,7 +35,7 @@ exports.fetchComments = function(media) {
 			} else if (comments) {
 				resolve(comments);
 			} else {
-				reject(err);
+				resolve([]);
 			}
 		});
 	});

@@ -1,26 +1,12 @@
-//MARK: DEPENDENCIES
+'use strict';
+
+let express = require('express');
+let app = express();
 var Promise = require('bluebird');
-var Leaf = require('./Leaf.js');
+
+var Media = require('../models/MediaSchema.js');
 var Comment = require('./Comment.js');
-
-// MARK: MODEL
-var mediaSchema = mongoose.Schema({
-	user: String,
-	mediaInfo: {
-		mediaID: String,
-		url: String,
-		mediaType: String,
-	},
-	leaf: String,
-	comments: [String],
-	meta: {
-		timestamp: Number,
-		leafPath: String,
-		description: String,
-	}
-});
-
-var Media = mongoose.model('Media', mediaSchema);
+var Leaf = require('./Leaf.js');
 
 exports.postMedia = function(req, res) {
 	console.log(req.body.params.mediaInfo.mediaID);
@@ -108,9 +94,11 @@ exports.fetchMediaForLeaves = function(leaves) {
 				});
 			}
 		}
-		debugger;
 		fetchMediaWithId(leafIds).then(function(media) {
-			resolve(media);
+			Comment.fetchComments(media).then(function(comments) {
+				var mediaInfo = { "media": media, "included" : comments };
+				resolve(mediaInfo);
+			});
 		});
 	});
 }
@@ -125,7 +113,7 @@ function fetchMediaWithId(mediaIds) {
 				resolve(media);
 				debugger;
 			} else {
-				reject(err);
+				resolve([]);
 			}
 		});
 	});
