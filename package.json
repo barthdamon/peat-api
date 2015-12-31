@@ -13,7 +13,7 @@
     "type": "git",
     "url": "git://github.com/barth1337/peat-api.git"
   },
-  "author": "Barth1337",
+  "author": "barthdamon",
   "license": "MIT",
   "dependencies": {
     "bluebird": "^3.0.5",

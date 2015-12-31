@@ -149,5 +149,3 @@ exports.searchUsers = function(req, res) {
 		}
 	});
 }
-
-exports.User = User;
