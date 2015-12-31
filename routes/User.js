@@ -3,7 +3,8 @@
 //MARK: DEPENDENCIES
 let express = require('express');
 let app = express();
-var mongoose = require('mongoose');
+
+var Promise = require('bluebird');
 var jwt = require('jwt-simple');
 
 var User = require('../models/UserSchema.js');
@@ -28,6 +29,20 @@ exports.findUser = function (req) {
 	} else {
 	res.status(400).json({"message" : "Invalid tokenAuth request format"});
 	}
+}
+
+exports.attachUser = function(req, id) {
+	return new Promise(function(resolve, reject) {
+	  	User.findOne({ _id: id }, function (err, user) {
+	  		if (user) {
+	  			console.log("<<<USER FOUND THROUGH TOKEN AUTH: " + user[0] + ">>>");
+	  			req.user = user;
+	  			resolve(user);		  							  			
+	  		} else {
+				reject(err);			  			
+	  		}
+	  	});
+	});
 }
 
 //MARK: New

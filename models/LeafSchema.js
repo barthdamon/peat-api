@@ -28,4 +28,4 @@ var leafSchema = mongoose.Schema({
 mongoose.model('Leaf', leafSchema);
 var Leaf = db.model('Leaf');
 
-exports.Leaf = Leaf;
+module.exports = Leaf;

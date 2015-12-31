@@ -25,4 +25,4 @@ var threadSchema = mongoose.Schema({
 mongoose.model('Thread', messageSchema);
 var Thread = db.model('Thread');
 
-exports.Thread = Thread;
+module.exports = Thread;

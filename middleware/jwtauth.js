@@ -6,7 +6,7 @@ let app = express();
 var jwt = require('jwt-simple');
 
 let API_AUTH_PASSWORD = process.env.API_PASSWORD;
-var users = require('./../models/UserSchema.js');
+var User = require('./../routes/User.js');
 
 //MARK: EXPORTS
 module.exports = function(req, res, next) {
@@ -42,16 +42,11 @@ module.exports = function(req, res, next) {
 					  	// if (decoded.exp < Date.now()) {
 					  	// 	res.status(300).json({"message" : "Auth Token Expired"})
 					  	// } else {
-						  	users.User.find({ _id: decoded.iss }, function (err, user) {
-						  		if (user) {
-						  			console.log("<<<USER FOUND THROUGH TOKEN AUTH: " + user[0] + ">>>");
-						  			req.user = user[0];		  			
-						  			next();					  			
-						  		} else {
-									res.status(401).json({"message": "Token not matched to user"});					  			
-						  		}
-						  	});
-					  	// }
+						  	User.attachUser(req, decoded.iss).then(function(user) {
+						  		next();
+						  	}).catch(function(err) {
+								res.status(400).json({"message": "notification token registration failure: " + err});
+							});
 					} else {
 						res.status(400).json({"message" : "Invalid tokenAuth request format"});
 					}

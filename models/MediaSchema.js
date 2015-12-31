@@ -29,4 +29,4 @@ var mediaSchema = mongoose.Schema({
 mongoose.model('Media', mediaSchema);
 var Media = db.model('Media');
 
-exports.Media = Media;
+module.exports = Media;
