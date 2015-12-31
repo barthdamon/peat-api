@@ -18,10 +18,10 @@ exports.findUser = function (req) {
 	  		res.status(404).json({"message" : "Incorrect Auth Token: "+err});
 	  	}
 		// if (decoded.exp < Date.now()) {res.status(300).json({"message" : "Auth Token Expired"})};
-	  	User.find({ _id: decoded.iss }, function (err, user) {
+	  	User.findOne({ _id: decoded.iss }, function (err, user) {
 	  		if (user) {
 	  			// console.log(user[0]);
-				return(user[0].email);		  			
+				return(user.email);		  			
 	  		} else {
 				res.status(400).json({"message": "Token not matched to user"});					  			
 	  		}
