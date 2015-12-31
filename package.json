@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "NODE_ENV=development API_PASSWORD=fartpoop nodemon app.js",
+    "debug": "NODE_ENV=development API_PASSWORD=fartpoop JWT_SECRET_TOKEN=secretStringFTW node debug app.js",
+    "dev": "NODE_ENV=development API_PASSWORD=fartpoop JWT_SECRET_TOKEN=secretStringFTW nodemon app.js",
     "start": "node app.js"
   },
   "repository": {

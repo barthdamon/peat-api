@@ -35,7 +35,7 @@ exports.attachUser = function(req, id) {
 	return new Promise(function(resolve, reject) {
 	  	User.findOne({ _id: id }, function (err, user) {
 	  		if (user) {
-	  			console.log("<<<USER FOUND THROUGH TOKEN AUTH: " + user[0] + ">>>");
+	  			console.log("<<<USER FOUND THROUGH TOKEN AUTH: " + user + ">>>");
 	  			req.user = user;
 	  			resolve(user);		  							  			
 	  		} else {

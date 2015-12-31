@@ -26,10 +26,10 @@ exports.createMessage = function(req, res) {
 }
 
 //MARK: LOCAL
-exports.fetchComments = function(media) {
-	var mediaId = media._id;
+exports.fetchComments = function(mediaIds) {
+	debugger;
 	return new Promise(function(resolve, reject){
-		Comment.find({ media: mediaId }).sort({timestamp: -1}).limit(10).exec(function(err, comments) {
+		Comment.find({media: { $in: mediaIds }}).sort({timestamp: -1}).limit(10).exec(function(err, comments) {
 			if (err) {
 				reject(err);
 			} else if (comments) {

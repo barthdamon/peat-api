@@ -20,6 +20,7 @@ module.exports = function(req, res, next) {
 				break;
 
 			case "Basic":
+				//NEED TO CHECK TO MAKE SURE PERSON IS GOING TO /LOGIN?
 				console.log("BASIC AUTH");
 				next();
 				break;
@@ -31,10 +32,13 @@ module.exports = function(req, res, next) {
 					var decoded = null;
 					if (token) {
 					  	try {
-				   		decoded = jwt.decode(token, app.get('jwtTokenSecret'));
+				   		decoded = jwt.decode(token, process.env.JWT_SECRET_TOKEN);
+				   		debugger;
 					  	} catch (err) {
 					  		res.status(401).json({"message" : "Incorrect Auth Token: "+err});
+					  		debugger;
 					  	}
+					  	debugger;
 					  	console.log(decoded);
 
 					  	// get user id from the db, check to make sure the exp isn't invalid
@@ -42,11 +46,12 @@ module.exports = function(req, res, next) {
 					  	// if (decoded.exp < Date.now()) {
 					  	// 	res.status(300).json({"message" : "Auth Token Expired"})
 					  	// } else {
-						  	User.attachUser(req, decoded.iss).then(function(user) {
-						  		next();
-						  	}).catch(function(err) {
-								res.status(400).json({"message": "notification token registration failure: " + err});
-							});
+
+					  	User.attachUser(req, decoded.iss).then(function(user) {
+					  		next();
+					  	}).catch(function(err) {
+							res.status(400).json({"message": "User not found for token: " + err});
+						});
 					} else {
 						res.status(400).json({"message" : "Invalid tokenAuth request format"});
 					}
@@ -54,7 +59,6 @@ module.exports = function(req, res, next) {
 				} else {
 					res.status(400).json({"message" : "Invalid post format"});
 				}
-
 
 			default:
 				res.status(400).json({"message" : "Invalid auth type"});

@@ -82,38 +82,37 @@ exports.extendNewsfeed = function(req, res) {
 	});
 }
 
-//MARK: LOCAL
 exports.fetchMediaForLeaves = function(leaves) {
 	return new Promise(function(resolve, reject) {
-		var leafIds = [];
+		var mediaIds = [];
 
-		for (i = 0; i < leaves.length; i++) {
+		for (var i = 0; i < leaves.length; i++) {
 			if (leaves[i].media.length > 0) {
-				leaves[i].media.forEach(function(leaf){
-					leafIds.push(leaf);
+				leaves[i].media.forEach(function(media){
+					mediaIds.push(media);
 				});
 			}
 		}
-		fetchMediaWithId(leafIds).then(function(media) {
-			Comment.fetchComments(media).then(function(comments) {
-				var mediaInfo = { "media": media, "included" : comments };
-				resolve(mediaInfo);
-			});
+		fetchMediaWithIds(mediaIds).then(function(mediaInfo) {
+			resolve(mediaInfo);
 		});
 	});
 }
 
-//needs to take an array of ids
-function fetchMediaWithId(mediaIds) {
+//MARK: LOCAL
+function fetchMediaWithIds(mediaIds) {
 	return new Promise(function(resolve, reject) {
 		Media.find({_id: { $in: mediaIds }}, function(err, media) {
 			if (err) {
 				reject(err);
 			} else if (media) {
-				resolve(media);
-				debugger;
+				Comment.fetchComments(mediaIds).then(function(comments) {
+					var mediaInfo = { "media": media, "included" : comments };
+					resolve(mediaInfo);
+					debugger;
+				});				
 			} else {
-				resolve([]);
+				resolve({"media": [], "included" : []});
 			}
 		});
 	});
