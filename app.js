@@ -2,22 +2,20 @@
 
 let express = require('express');
 let app = express();
+
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
-
-//MARK: CONFIG
-//TODO add switch for heroku secret token
-app.set('jwtTokenSecret', 'secretStringFTW');
 app.set('port', (process.env.PORT || 3000));
 
 //MARK: MIDDLEWARE
 var bodyParser = require('body-parser');
 var jwtauth = require('./middleware/jwtauth.js');
 var standardLogs = require('./middleware/standardLogs.js');
+var standardSecurity = require('./middleware/standardSecurity.js');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(standardLogs);
-app.use(jwtauth);
+app.use(standardSecurity);
 
 //MARK: Models
 var users = require('./routes/User.js');
@@ -25,16 +23,18 @@ var media = require('./routes/Media.js');
 var leaf = require('./routes/Leaf.js');
 
 //MARK: ROUTES
+//Public Routes
 app.get('/', function(req, res) {
 	res.status(200).json({"message":"Server Online"});
 });
 app.post('/', function(req, res) {
 	res.status(200).json({"message":"Server Online"});
 });
-
-//User
 app.post('/new', users.createUser);
 app.post('/login', users.login);
+
+//Private Routes
+app.use(jwtauth);
 app.post('/users/search', users.searchUsers);
 app.get('/friends', users.getFriends);
 app.put('/friends', users.putFriend);
