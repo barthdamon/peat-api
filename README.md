@@ -6,5 +6,5 @@ This is the API for Peat.
 
 - $ mongod
 
-- $ nodemon app
+- $ npm run dev
 
