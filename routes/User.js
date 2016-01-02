@@ -47,16 +47,18 @@ exports.attachUser = function(req, id) {
 
 //MARK: New
 exports.createUser = function(req, res) {
-	let name = req.body.user.name;
+	let first = req.body.user.first;
+	let last = req.body.user.last;
 	let username = req.body.user.username;
 	let email = req.body.user.email;
 	let password = req.body.user.password;
+
 	let newUser = new User({
-		name: name,
-		userName: username,
+		first: first,
+		last: last,
+		username: username,
 		email: email, 
-		password: password,
-		friends: []
+		password: password
 	});
 
 	newUser.save(function(err) {
@@ -74,7 +76,7 @@ exports.login = function(req, res) {
 	User.findOne({ email: req.body.user.email }, function(err, user) {
 		if (user) {
 			// console.log(user);
-			var userID = user['id'];
+			var userId = user['id'];
 			// console.log(userID);
 			user.comparePassword(req.body.user.password, function(err, isMatch) {
         		if (err) {
@@ -84,58 +86,19 @@ exports.login = function(req, res) {
 					var expires = date + 604800000;
 					//encode using the jwt token secret
 					var token = jwt.encode({
-					  	iss: userID,
+					  	iss: userId,
 					  	exp: expires
 					}, process.env.JWT_SECRET_TOKEN);
 
 					res.status(200).json({
 					  api_authtoken : token,
 					  authtoken_expiry: expires,
-					  user_email: user.email
+					  user: user.userId
 					});
         		}
    		});
 		} else {
 			res.status(400).json({"message": "User not found"});
-		}
-	});
-}
-
-//MARK: Friends
-exports.putFriend = function(req, res) {
-	//find the user in the db and then add the friend sent to that users array of friends
-	var newFriendId = req.body.friend;
-	var updatedFriends = [];
-	var friendExists = false;
-	console.log("1");
-
-	if (newFriendId) {
-		User.update({ '_id' : req.user._id }, { $addToSet : { 'friends': newFriendId } }, function (err, result) {
-			if (err) {
-			res.status(400).json({"message": "Error occured while adding friend"});
-			} else {
-				console.log(result);
-				res.status(200).json({"message": "Friend Added"});
-			}
-	   });
-   } else {
-   	res.status(400).json({"message": "Could not parse friend to add"});
-   }			
-}
-
-exports.getFriends = function(req, res) {
-	var friends = req.user.friends;
-	var fetchedFriends = [];
-	User.find( { _id: { $in: friends }}, function(err, users) {
-		if (err) {
-			console.log(err);
-		} else {
-			fetchedFriends = users;
-			if (fetchedFriends.length > 0) {
-				res.status(200).json({"friends": fetchedFriends});
-			} else {
-				res.status(400).json({"message": "YOU HAVE NO FRIENDS"});
-			}
 		}
 	});
 }
