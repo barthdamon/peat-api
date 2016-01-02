@@ -2,9 +2,12 @@
 
 This is the API for Peat.
 
-- $ npm install
+Install dependencies:
+```$ npm install```
 
-- $ mongod
+Boot up a local mongo server:
+```$ mongod```
 
-- $ nodemon app
+Run for development environment:
+```$ npm run dev```
 
