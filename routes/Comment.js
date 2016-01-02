@@ -9,10 +9,10 @@ var Comment = require('../models/CommentSchema.js');
 exports.createMessage = function(req, res) {
 	var currentTime = Date.now();
 	var newComment = new Comment({
-		sender: req.body.params.sender,
-		media: req.body.params.media,
-		witnessEvent: req.body.params.witnessEvent,
-		text: req.body.params.text,
+		sender: req.body.sender,
+		media: req.body.media,
+		witnessEvent: req.body.witnessEvent,
+		text: req.body.text,
 		timestamp: currentTime
 	});
 

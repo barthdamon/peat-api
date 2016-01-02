@@ -1,3 +1,4 @@
+
 'use strict';
 
 let express = require('express');
@@ -9,22 +10,22 @@ var Comment = require('./Comment.js');
 var Leaf = require('./Leaf.js');
 
 exports.postMedia = function(req, res) {
-	console.log(req.body.params.mediaInfo.mediaID);
+	console.log(req.body.mediaInfo.mediaID);
 	// console.log(req.user._id)
 	var currentTime = Date.now();
 	var postedMedia = new Media({
 		user: req.user.email,
 		mediaInfo: {
-			mediaID: req.body.params.mediaInfo.mediaID,
-			url: req.body.params.mediaInfo.url,
-			mediaType: req.body.params.mediaInfo.mediaType,
+			mediaID: req.body.mediaInfo.mediaID,
+			url: req.body.mediaInfo.url,
+			mediaType: req.body.mediaInfo.mediaType,
 		},
-		leaf: req.body.params.leaf,
-		comments: req.body.params.comments,
+		leaf: req.body.leaf,
+		comments: req.body.comments,
 		meta: {
 			timestamp: currentTime,
-			leafPath: req.body.params.meta.leafPath,
-			description: req.body.params.meta.description,
+			leafPath: req.body.meta.leafPath,
+			description: req.body.meta.description,
 		}		
 	});
 

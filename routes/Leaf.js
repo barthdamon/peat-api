@@ -1,3 +1,4 @@
+
 'use strict';
 
 /* NOTE: all connections are PREVIOUS connections to nodes above the node. 
@@ -30,13 +31,13 @@ exports.createLeaf = function(req, res) {
 	var postedLeaf = new Leaf({
 		user: req.user.email,
 		coordinates: {
-			x: req.body.params.coordinates.x,
-			y: req.body.params.coordinates.y
+			x: req.body.coordinates.x,
+			y: req.body.coordinates.y
 		},
-		abilityTitle: req.body.params.abilityTitle,
-		completionStatus: req.body.params.completionStatus,
-		activity: req.body.params.activity,
-		connections: req.body.params.connections
+		abilityTitle: req.body.abilityTitle,
+		completionStatus: req.body.completionStatus,
+		activity: req.body.activity,
+		connections: req.body.connections
 	});
 
 	postedLeaf.save(function(err) {

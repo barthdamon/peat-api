@@ -47,10 +47,10 @@ exports.attachUser = function(req, id) {
 
 //MARK: New
 exports.createUser = function(req, res) {
-	let name = req.body.params.user.name;
-	let username = req.body.params.user.username;
-	let email = req.body.params.user.email;
-	let password = req.body.params.user.password;
+	let name = req.body.user.name;
+	let username = req.body.user.username;
+	let email = req.body.user.email;
+	let password = req.body.user.password;
 	let newUser = new User({
 		name: name,
 		userName: username,
@@ -70,13 +70,13 @@ exports.createUser = function(req, res) {
 
 //MARK: Basic Auth
 exports.login = function(req, res) {
-	console.log(req.body.params.user.email);
-	User.findOne({ email: req.body.params.user.email }, function(err, user) {
+	console.log(req.body.user.email);
+	User.findOne({ email: req.body.user.email }, function(err, user) {
 		if (user) {
 			// console.log(user);
 			var userID = user['id'];
 			// console.log(userID);
-			user.comparePassword(req.body.params.user.password, function(err, isMatch) {
+			user.comparePassword(req.body.user.password, function(err, isMatch) {
         		if (err) {
         			res.status(403).json({"message": "User password incorrect"});
         		} else {
