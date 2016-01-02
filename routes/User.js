@@ -13,7 +13,7 @@ exports.findUser = function (req) {
 	var token = req.get('token');
 	if (token) {
 	  	try {
-   		var decoded = jwt.decode(token, app.get('jwtTokenSecret'));
+   		var decoded = jwt.decode(token, process.env.JWT_SECRET_TOKEN);
 	  	} catch (err) {
 	  		res.status(404).json({"message" : "Incorrect Auth Token: "+err});
 	  	}
@@ -71,28 +71,30 @@ exports.createUser = function(req, res) {
 //MARK: Basic Auth
 exports.login = function(req, res) {
 	console.log(req.body.params.user.email);
-	User.find({ email: req.body.params.user.email }, function(err, user) {
+	User.findOne({ email: req.body.params.user.email }, function(err, user) {
 		if (user) {
 			// console.log(user);
-			var userID = user[0]['id'];
+			var userID = user['id'];
 			// console.log(userID);
-				if (req.body.params.user.password == user[0]['password']) {
-					var date = Date.now()
+			user.comparePassword(req.body.params.user.password, function(err, isMatch) {
+        		if (err) {
+        			res.status(403).json({"message": "User password incorrect"});
+        		} else {
+					var date = Date.now();
 					var expires = date + 604800000;
 					//encode using the jwt token secret
 					var token = jwt.encode({
 					  	iss: userID,
 					  	exp: expires
-					}, app.get('jwtTokenSecret'));
+					}, process.env.JWT_SECRET_TOKEN);
 
 					res.status(200).json({
 					  api_authtoken : token,
 					  authtoken_expiry: expires,
 					  user_email: user.email
 					});
-				} else {
-					res.status(403).json({"message": "User password incorrect"});
-				}
+        		}
+   		});
 		} else {
 			res.status(400).json({"message": "User not found"});
 		}
