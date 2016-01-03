@@ -34,15 +34,25 @@ exports.createFriend = function(req, res) {
 //r
 exports.getFriends = function(req, res) {
 	let user = req.body.user;
-	var fetchedFriends = [];
-	User.find({ $or : [{ sender: user }, { recipient: user }] }, function(err, friends) {
-		if (err) {
-			console.log(err);
-			res.status(400).json({"message": "Error getting friends: " + err});
-		} else {
-			fetchedFriends = friends;
-			res.status(200).json({"friends": fetchedFriends});
-		}
+	findFriends(user).then(function(fetchedFriends) {
+		res.status(200).json({"friends": fetchedFriends});
+	}).catch(function(err) {
+		res.status(400).json({"message": "Error getting friends: " + err});
+	});
+}
+
+exports.findFriends(user) {
+	return new Promise(function(resolve, reject) {
+		var fetchedFriends = [];
+		User.find({ $or : [{ sender: user }, { recipient: user }] }, function(err, friends) {
+			if (err) {
+				console.log(err);
+				reject(err);
+			} else {
+				fetchedFriends = friends;
+				resolve(fetchedFriends);
+			}
+		});
 	});
 }
 
