@@ -11,7 +11,7 @@ exports.createStructureFromJson = function(json) {
 	let coordinates = json.coordinates;
 	let abilityTitle = json.abilityTitle;
 	//need your own id in order to connect
-	let connectionId = json.connectionId;
+	let stableId = json.stableId;
 	let connections = json.connections;
 	let demos = json.demos;
 
@@ -19,7 +19,7 @@ exports.createStructureFromJson = function(json) {
 		activityType: activityType,
 		coordinates: coordinates,
 		abilityTitle: abilityTitle,
-		connectionId: connectionId,
+		stableId: stableId,
 		connections: connections,
 		demos: demos
 	});

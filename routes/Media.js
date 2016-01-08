@@ -14,6 +14,7 @@ var Leaf = require('./Leaf.js');
 exports.postMedia = function(req, res) {
 	console.log(req.body.mediaInfo.mediaId);
 	let currentTime = Date.now();
+	//Leaf structure MUST be the stableId of the leaf
 	let leafStructure = req.body.leafStructure;
 	let viewing = req.body.viewing;
 	let user = viewing != null ? viewing : req.user._id;

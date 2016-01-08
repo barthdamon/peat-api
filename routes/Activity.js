@@ -7,6 +7,7 @@ var Promise = require('bluebird');
 // var Activity = require('../models/ActivitySchema.js');
 var LeafStructure = require('./LeafStructure.js');
 var LeafFiller = require('./LeafFiller.js');
+var LeafData = require('./../seed/LeafData.js');
 
 /*
 Tree:
@@ -27,15 +28,20 @@ exports.getActivity = function(req, res) {
 	//newsfeed is bool
 	let newsfeed = req.body.newsfeed;
 
-	LeafStructure.getStructureForActivity(activityType).then(function(structures) {
-		LeafFiller.getFillersForActivity(structures, user, viewing, newsfeed).then(function(filling){
-			res.status(200).json({"activity": activityType, "leafStructures": structures, "leafFilling": filling});
+	if (LeafData.isActivity(activityType)) {
+		LeafStructure.getStructureForActivity(activityType).then(function(structures) {
+			LeafFiller.getFillersForActivity(user, viewing, newsfeed).then(function(filling){
+				//Note: the filling's leaf structure field is the stableId of the structure
+				res.status(200).json({"activity": activityType, "leafStructures": structures, "leafFilling": filling});
+			}).catch(function(err){
+				console.log("Error fetching leaf filling" + err);
+				res.status(400).json({"message" : "Error fetching leaf filling"});
+			});
 		}).catch(function(err){
-			console.log("Error fetching leaf filling" + err);
-			res.status(400).json({"message" : "Error fetching leaf filling"});
+			console.log("Error fetching leaf structures" + err);
+			res.status(400).json({"message" : "Error fetching leaf structures"});
 		});
-	}).catch(function(err){
-		console.log("Error fetching leaf structures" + err);
-		res.status(400).json({"message" : "Error fetching leaf structures"});
-	});
+	} else {
+		res.status(400).json({"message" : "Invalid activity type"});
+	}
 }

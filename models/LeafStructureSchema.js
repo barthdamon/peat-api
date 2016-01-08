@@ -12,7 +12,7 @@ var leafStructureSchema = mongoose.Schema({
 		y: Number
 	},
 	abilityTitle: String,
-	connectionId: String,
+	stableId: String,
 	connections: [String],
 	demos: [String]
 });

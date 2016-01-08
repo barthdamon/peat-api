@@ -56,7 +56,7 @@ function createFiller(leafStructure, mediaId, user) {
 	});
 }
 
-exports.getFillersForActivity = function(structures, user, viewing, newsfeed) {
+exports.getFillersForActivity = function(user, viewing, newsfeed) {
 	return new Promise(function(resolve, reject) {
 		var params = {};
 
