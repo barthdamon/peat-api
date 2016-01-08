@@ -13,7 +13,6 @@ var Leaf = require('./Leaf.js');
 
 exports.postMedia = function(req, res) {
 	console.log(req.body.mediaInfo.mediaId);
-	// console.log(req.user._id)
 	let currentTime = Date.now();
 	let leafStructure = req.body.leafStructure;
 	let viewing = req.body.viewing;
@@ -88,23 +87,6 @@ exports.extendNewsfeed = function(req, res) {
 		} else {
 			res.status(204).json({"message": "No updates found"});
 		}
-	});
-}
-
-exports.fetchMediaForLeaves = function(leaves) {
-	return new Promise(function(resolve, reject) {
-		var mediaIds = [];
-
-		for (var i = 0; i < leaves.length; i++) {
-			if (leaves[i].media.length > 0) {
-				leaves[i].media.forEach(function(media){
-					mediaIds.push(media);
-				});
-			}
-		}
-		fetchMediaWithIds(mediaIds).then(function(mediaInfo) {
-			resolve(mediaInfo);
-		});
 	});
 }
 

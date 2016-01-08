@@ -9,4 +9,4 @@ let express = require('express');
 let app = express();
 var Promise = require('bluebird');
 
-
+//NOW you can set up the structures
