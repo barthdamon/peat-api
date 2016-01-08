@@ -18,9 +18,10 @@ app.use(standardLogs);
 app.use(standardSecurity);
 
 //MARK: Models
-var users = require('./routes/User.js');
-var media = require('./routes/Media.js');
-var leaf = require('./routes/Leaf.js');
+var User = require('./routes/User.js');
+var Media = require('./routes/Media.js');
+var Friend = require('./routes/Friend.js');
+var Activity = require('./routes/Activity.js');
 
 //MARK: ROUTES
 //Public Routes
@@ -32,8 +33,8 @@ publicRouter.get('/', function(req, res) {
 publicRouter.post('/', function(req, res) {
 	res.status(200).json({"message":"Server Online"});
 });
-publicRouter.post('/new', users.createUser);
-publicRouter.post('/login', users.login);
+publicRouter.post('/new', User.createUser);
+publicRouter.post('/login', User.login);
 
 app.use('/pub', publicRouter);
 
@@ -41,17 +42,11 @@ app.use('/pub', publicRouter);
 var privateRouter = express.Router();
 
 privateRouter.use(jwtauth);
-privateRouter.post('/users/search', users.searchUsers);
-privateRouter.get('/friends', users.getFriends);
-privateRouter.put('/friends', users.putFriend);
-//Media
-privateRouter.post('/media', media.postMedia);
-privateRouter.get('/media', media.getMedia);
-privateRouter.post('/media/update', media.getUpdate);
-privateRouter.post('/media/extend', media.extendNewsfeed);
-//Tree
-privateRouter.post('/leaves', leaf.createLeaf);
-privateRouter.post('/leaves/get', leaf.getLeaves);
+privateRouter.post('/users/search', User.searchUsers);
+privateRouter.get('/user/profile', User.userProfile);
+privateRouter.post('/friends', Friend.createFriend);
+privateRouter.post('/media', Media.postMedia);
+privateRouter.get('/activity', Activity.getActivity);
 
 app.use('/priv', privateRouter);
 

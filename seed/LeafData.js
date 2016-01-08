@@ -12,6 +12,8 @@ let activities = [
 	"trampoline"
 ];
 
+var dataStructures = [];
+
 /*Should be able to totally replace leaf structures when there are changes to the data
 (ie, remove them all, then stick them back in. Just make sure the stableIds stay the same)
 */
@@ -63,17 +65,18 @@ let snowboardingStructures = [
 	},
 ];
 
-
 //MARK: Script Actions
-function addStructureToDatabase(structure) {
-	LeafStructure.createStructureFromJson
-}
+dataStructures.concat(snowboardingStructures);
 
-snowboardingStructures.forEach(function(structure){
-
+LeafStructure.clearStructuresForSeed().then(function(result){
+	LeafStructure.createStructuresFromSeedJson(dataStructures).then(function(structures) {
+		console.log("SEED REPORT: Leaf Structures Seeded Successfully");
+	}).catch(function(err){
+		console.log("SEED REPORT: Leaf Structure Seed Failed");
+	});
+}).catch(function(err){
+	console.log("SEED REPORT: Leaf Structure Database Clear Unsuccessful");
 });
-
-
 
 
 
