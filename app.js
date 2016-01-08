@@ -24,28 +24,37 @@ var leaf = require('./routes/Leaf.js');
 
 //MARK: ROUTES
 //Public Routes
-app.get('/', function(req, res) {
+var publicRouter = express.Router();
+
+publicRouter.get('/', function(req, res) {
 	res.status(200).json({"message":"Server Online"});
 });
-app.post('/', function(req, res) {
+publicRouter.post('/', function(req, res) {
 	res.status(200).json({"message":"Server Online"});
 });
-app.post('/new', users.createUser);
-app.post('/login', users.login);
+publicRouter.post('/new', users.createUser);
+publicRouter.post('/login', users.login);
+
+app.use('/pub', publicRouter);
 
 //Private Routes
-app.use(jwtauth);
-app.post('/users/search', users.searchUsers);
-app.get('/friends', users.getFriends);
-app.put('/friends', users.putFriend);
+var privateRouter = express.Router();
+
+privateRouter.use(jwtauth);
+privateRouter.post('/users/search', users.searchUsers);
+privateRouter.get('/friends', users.getFriends);
+privateRouter.put('/friends', users.putFriend);
 //Media
-app.post('/media', media.postMedia);
-app.get('/media', media.getMedia);
-app.post('/media/update', media.getUpdate);
-app.post('/media/extend', media.extendNewsfeed);
+privateRouter.post('/media', media.postMedia);
+privateRouter.get('/media', media.getMedia);
+privateRouter.post('/media/update', media.getUpdate);
+privateRouter.post('/media/extend', media.extendNewsfeed);
 //Tree
-app.post('/leaves', leaf.createLeaf);
-app.post('/leaves/get', leaf.getLeaves);
+privateRouter.post('/leaves', leaf.createLeaf);
+privateRouter.post('/leaves/get', leaf.getLeaves);
+
+app.use('/priv', privateRouter);
+
 
 
 //MARK: SOCKET CONNECTIONS

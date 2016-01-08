@@ -17,11 +17,8 @@ var mediaSchema = mongoose.Schema({
 		url: String,
 		mediaType: String,
 	},
-	leaf: String,
-	comments: [String],
 	meta: {
 		timestamp: Number,
-		leafPath: String,
 		description: String,
 	}
 });

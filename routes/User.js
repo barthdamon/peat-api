@@ -9,26 +9,18 @@ var jwt = require('jwt-simple');
 
 var User = require('../models/UserSchema.js');
 
-exports.findUser = function (req) {
-	var token = req.get('token');
-	if (token) {
-	  	try {
-   		var decoded = jwt.decode(token, process.env.JWT_SECRET_TOKEN);
-	  	} catch (err) {
-	  		res.status(404).json({"message" : "Incorrect Auth Token: "+err});
-	  	}
-		// if (decoded.exp < Date.now()) {res.status(300).json({"message" : "Auth Token Expired"})};
-	  	User.findOne({ _id: decoded.iss }, function (err, user) {
+
+//MARK: Internal
+exports.findUser = function (userId) {
+	return new Promise(function(resolve, reject) {
+	  	User.findOne({ _id: userId }, function (err, user) {
 	  		if (user) {
-	  			// console.log(user[0]);
-				return(user.email);		  			
+	  			resolve(user);		  							  			
 	  		} else {
-				res.status(400).json({"message": "Token not matched to user"});					  			
+				reject(err);			  			
 	  		}
 	  	});
-	} else {
-	res.status(400).json({"message" : "Invalid tokenAuth request format"});
-	}
+	});
 }
 
 exports.attachUser = function(req, id) {
@@ -45,7 +37,24 @@ exports.attachUser = function(req, id) {
 	});
 }
 
-//MARK: New
+exports.userInfo = function(user) {
+	return {
+		_id: user._id,
+		first: user.first,
+		last: user.last,
+		username: user.username,
+		email: user.email
+	};
+}
+
+
+
+
+
+
+
+//MARK: External
+//New
 exports.createUser = function(req, res) {
 	let first = req.body.user.first;
 	let last = req.body.user.last;
@@ -70,7 +79,7 @@ exports.createUser = function(req, res) {
 	});
 }
 
-//MARK: Basic Auth
+//Basic Auth
 exports.login = function(req, res) {
 	console.log(req.body.user.email);
 	User.findOne({ email: req.body.user.email }, function(err, user) {
@@ -108,9 +117,34 @@ exports.searchUsers = function(req, res) {
 	console.log("User Search Term: " +searchTerm);
 	User.find( {$or : [ {username: {$regex : searchTerm, $options: 'i'}}, {name: {$regex: searchTerm, $options: 'i'}} ] }, function(err, users) {
 		if (users) {
-			res.status(200).json({"users": users});
+			let info = [];
+			users.forEach(function(user){
+				info.push(userInfo(user));
+			});
+			res.status(200).json({"users": info});
 		} else {
 			res.status(400).json({"message": "Error finding users"});
 		}
 	});
+}
+
+exports.userProfile = function(req, res) {
+	let userData = {};
+	let viewing = req.body.viewing;
+	let userId = viewing != null ? viewing : req.user;
+
+	findUser(userId).then(function(user){
+		userData.userInfo = userInfo(user);
+	}).catch(function(err){
+		console.log("Error fetching user" + err);
+	});
+
+	//Attach friend data
+	Friend.findFriends(req.user).then(function(fetchedFriends){
+		userData.friends = fetchedFriends;
+	}).catch(function(err){
+		console.log("Error fetching friends" + err);
+	});
+
+	res.status(200).json({"userData" : userData});
 }

@@ -7,40 +7,48 @@ var Promise = require('bluebird');
 
 var Media = require('../models/MediaSchema.js');
 var Comment = require('./Comment.js');
+var LeafFiller = require('./LeafFiller.js');
+
 var Leaf = require('./Leaf.js');
 
 exports.postMedia = function(req, res) {
-	console.log(req.body.mediaInfo.mediaID);
+	console.log(req.body.mediaInfo.mediaId);
 	// console.log(req.user._id)
-	var currentTime = Date.now();
+	let currentTime = Date.now();
+	let leafStructure = req.body.leafStructure;
+	let viewing = req.body.viewing;
+	let user = viewing != null ? viewing : req.user._id;
+
 	var postedMedia = new Media({
-		user: req.user.email,
+		user: user,
 		mediaInfo: {
-			mediaID: req.body.mediaInfo.mediaID,
+			mediaId: req.body.mediaInfo.mediaId,
 			url: req.body.mediaInfo.url,
 			mediaType: req.body.mediaInfo.mediaType,
 		},
-		leaf: req.body.leaf,
-		comments: req.body.comments,
 		meta: {
 			timestamp: currentTime,
-			leafPath: req.body.meta.leafPath,
 			description: req.body.meta.description,
-		}		
+		}	
 	});
 
 	postedMedia.save(function(err) {
-		if(err){
-			res.status(400).json({ "message": "server media post failure: " + err });
+		if(err) {
+			res.status(400).json({ "message": "media post failure: " + err });
 		} else {
-			Leaf.putMediaOnLeaf(postedMedia, res);
+			LeafFiller.createFiller(leafStructure, mediaId, user).then(function(filler) {
+				res.status(201).json({ "message": "media created and added to leaf filler" });
+			}).catch(function(err) {
+				console.log("error adding media to filler: " + err);
+				res.status(400).json({ "message": "error adding media to leaf filler" });
+			});
 		}
 	});
 }
 
 exports.getMedia = function(req, res) {
 	//TODO: Add more here to return just the most recent 5 or so. Then in extend make that a post and send down the next most recent 5
-	Media.find({ user: req.user.email }).sort({timestamp: -1}).limit(5).exec(function(err, media) {
+	Media.find({ user: req.user._id }).sort({timestamp: -1}).limit(5).exec(function(err, media) {
 		if (err) {
 			res.status(400).json({"message": "Error finding media"});
 		} else if (media) {

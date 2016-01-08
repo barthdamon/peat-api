@@ -1,4 +1,3 @@
-
 'use strict';
 
 /* NOTE: all connections are PREVIOUS connections to nodes above the node. 
@@ -29,7 +28,7 @@ exports.putMediaOnLeaf = function(media, res) {
 
 exports.createLeaf = function(req, res) {
 	var postedLeaf = new Leaf({
-		user: req.user.email,
+		user: req.user._id,
 		coordinates: {
 			x: req.body.coordinates.x,
 			y: req.body.coordinates.y
@@ -52,7 +51,7 @@ exports.createLeaf = function(req, res) {
 exports.getLeaves = function(req, res) {
 	var activity = req.body.activity;
 	console.log("ACTIVITY: " +activity);
-	Leaf.find({activity: activity, user: req.user.email }, function(err, leaves) {
+	Leaf.find({activity: activity, user: req.user._id }, function(err, leaves) {
 		if (err) {
 			console.log("ERROR: "+err);
 			res.status(400).json({"message": "Error featching leaves"});
