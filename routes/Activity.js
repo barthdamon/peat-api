@@ -21,27 +21,58 @@ which are generated for either a user, or a users friends
 */
 
 exports.getActivity = function(req, res) {
-	let activityType = req.body.activityType;
-	//Sorts between user and viewing and newsfeed on the leaf filler route
-	let user = req.user;
-	let viewing = req.body.viewing;
-	//newsfeed is bool
-	let newsfeed = req.body.newsfeed;
+	let activityType = req.params.type;
+	let user = req.body.viewing != null ? req.body.viewing : req.user._id;
 
-	if (LeafData.isActivity(activityType)) {
-		LeafStructure.getStructureForActivity(activityType).then(function(structures) {
-			LeafFiller.getFillersForActivity(user, viewing, newsfeed).then(function(filling){
-				//Note: the filling's leaf structure field is the stableId of the structure
-				res.status(200).json({"activity": activityType, "leafStructures": structures, "leafFilling": filling});
-			}).catch(function(err){
-				console.log("Error fetching leaf filling" + err);
-				res.status(400).json({"message" : "Error fetching leaf filling"});
-			});
-		}).catch(function(err){
-			console.log("Error fetching leaf structures" + err);
-			res.status(400).json({"message" : "Error fetching leaf structures"});
+	if (activityType && LeafData.isActivity(activityType)) {
+		//using a callback cause there was a weird bug with promises.....
+		LeafStructure.getStructuresForActivity(activityType, function(err, structures){
+			if (err) {
+				console.log("Error fetching leaf structures" + err);
+				res.status(400).json({message : "Error fetching leaf structures"});
+			} else {
+				var structureIds = [];
+				structures.forEach(function(struct){
+					structureIds.push(struct.stableId);
+				});
+				return LeafFiller.getFillersForActivity(user, structureIds).then(function(filling){
+					//Note: the filling's leaf structure field is the stableId of the structure
+					res.status(200).json({activity: activityType, leafStructures: { data : structures }, leafFilling: { data : filling }});
+				}).catch(function(err){
+					console.log("Error fetching leaf filling" + err);
+					res.status(400).json({message : "Error fetching leaf filling"});
+				});
+			}
 		});
 	} else {
-		res.status(400).json({"message" : "Invalid activity type"});
+		res.status(400).json({message : "Invalid activity type"});
+	}
+}
+
+exports.getActivityNewsfeed = function(req, res) {
+	let activityType = req.params.type;
+	let user = req.user._id;
+
+	if (activityType && LeafData.isActivity(activityType)) {
+		LeafStructure.getStructuresForActivity(activityType, function(err, structures){
+			if (err) {
+				console.log("Error fetching leaf structures" + err);
+				res.status(400).json({message : "Error fetching leaf structures"});
+			} else {
+				var structureIds = [];
+				structures.forEach(function(struct){
+					structureIds.push(struct.stableId);
+				});
+				return LeafFiller.getFillersForActivityNewsfeed(user, structureIds).then(function(filling){
+					//Note: the filling's leaf structure field is the stableId of the structure
+					res.status(200).json({activity: activityType, leafStructures: { data : structures }, leafFilling: { data : filling }});
+				}).catch(function(err){
+					console.log("Error fetching leaf filling" + err);
+					res.status(400).json({message : "Error fetching leaf filling"});
+				});
+			}
+		});
+	} else {
+		res.status(400).json({message : "Invalid activity type"});
 	}
 }

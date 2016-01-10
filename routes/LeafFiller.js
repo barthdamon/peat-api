@@ -6,6 +6,7 @@ var Promise = require('bluebird');
 
 var LeafFiller = require('../models/LeafFillerSchema.js');
 var Friend = require('./Friend.js');
+var Media = require('./Media.js');
 
 //Called when posting media
 exports.addMediaToFiller = function(leafStructure, mediaId, user) {
@@ -15,7 +16,9 @@ exports.addMediaToFiller = function(leafStructure, mediaId, user) {
 				console.log("Error finding leaf filler: " + err);
 				reject(err);
 			} else {
-				if (filler) {
+
+				if (filler.length > 0) {
+					console.log('filler found' + filler);
 					LeafFiller.update({user: user, leafStructure: leafStructure}, {$push: { media: mediaId }}, function(err, filler) {
 						if (err) {
 							console.log("Error updating media on leaf filler: " + err);
@@ -25,6 +28,7 @@ exports.addMediaToFiller = function(leafStructure, mediaId, user) {
 						}
 					});
 				} else {
+					console.log('creating new filler');
 					createFiller(leafStructure, mediaId, user).then(function(err, newFiller){
 						resolve(newFiller);
 					}).catch(function(err){
@@ -56,57 +60,73 @@ function createFiller(leafStructure, mediaId, user) {
 	});
 }
 
-exports.getFillersForActivity = function(user, viewing, newsfeed) {
+
+
+//MARK: Get routes for activity
+
+exports.getFillersForActivity = function(user, structures) {
 	return new Promise(function(resolve, reject) {
 		var params = {};
-
-		if (newsfeed != null && newsfeed == true) {
-			//fill for the users friends (need to get friends), newsfeed 
-			Friend.findFriends(user).then(function(friends){
-				let friendIds = [];
-				friends.forEach(function(friend) {
-					friendIds.push(friend._id);
-				});
-				findLeafFillers({user: { $in: friendIds }}).then(function(filling){
-					resolve(filling);
-				}).catch(function(err){
-					console.log("Error leaf filling for friends: " + err);
-					reject(err);
-				});
-			}).catch(function(err){
-				console.log("Error fetching friends for leaf filling: " + err);
-				reject(err);
-			});
-
-		} else if (viewing != null) {
-			// fill for the user being viewed (viewing is the id of a user)
-			findLeafFillers({ user : viewing }).then(function(filling){
-				resolve(filling);
-			}).catch(function(err){
-				console.log("Error fetching leaf filling for user beging viewed: " + err);
-				reject(err);
-			});
-		} else {
-			//Only fill for the user (user is the middleware attached user on the request)
-			findLeafFillers({ user : user._id }).then(function(filling){
-				resolve(filling);
-			}).catch(function(err){
-				console.log("Error fetching leaf filling for user: " + err);
-				reject(err);
-			});
-		}
-	});
-}
-
-function findLeafFillers(params) {
-	return new Promise(function(resolve, reject) {
-		LeafFiller.find(params, function(err, filling) {
+		LeafFiller.find({ user: user, leafStructure: { $in: structures }}, function(err, filling) {
 			if (err) {
 				console.log(err);
 				reject(err);
 			} else {
-				resolve(filling);
-			}			
+				getMediaFromFilling(filling).then(function(media){
+					resolve({filling: filling, included: media});
+				});
+			}
 		});
 	});
 }
+
+exports.getFillersForActivityNewsfeed = function(user, structures) {
+	return new Promise(function(resolve, reject) {
+		console.log('FETCHING FOR ACTIVITY NEWSFEED');
+		Friend.findFriends(user).then(function(friends){
+			let friendIds = [];
+			friends.forEach(function(friend) {
+				if (friend.confirmed) {
+					friendIds.push(friend.recipient);
+					friendIds.push(friend.sender);
+				}
+			});
+			console.log("FRIEND IDS: " +friendIds);
+			LeafFiller.find({user: { $in: friendIds }, leafStructure: { $in: structures} }, function(err, filling) {
+				if (err) {
+					console.log(err);
+					reject(err);
+				} else {
+					console.log('FILLING: '+filling);
+					getMediaFromFilling(filling).then(function(media){
+						resolve({filling: filling, included: media});
+					});
+				}			
+			});
+		}).catch(function(err){
+			console.log("Error fetching friends for leaf filling: " + err);
+			reject(err);
+		});
+	});
+}
+
+
+function getMediaFromFilling(filling) {
+	return new Promise(function(resolve, reject){
+		var mediaIds = [];
+		filling.forEach(function(filler){
+			filler.media.forEach(function(mediaId){
+				mediaIds.push(mediaId);
+			});
+		});
+		Media.fetchMediaWithIds(mediaIds).then(function(media){
+			resolve(media);
+		}).catch(function(err){
+			console.log("Error fetching media for leaf filling");
+			reject(err);
+		});
+	});
+}
+
+
+

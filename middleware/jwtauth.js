@@ -9,7 +9,7 @@ var User = require('./../routes/User.js');
 
 //MARK: EXPORTS
 module.exports = function(req, res, next) {
-	console.log("hitting jtw auth");
+	console.log("hitting jwt auth");
 	switch (req.get('auth_type')) {
 	case "Token":
 		//query the db for the jwt that matches the user

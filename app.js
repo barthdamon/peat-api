@@ -30,25 +30,25 @@ var publicRouter = express.Router();
 publicRouter.get('/', function(req, res) {
 	res.status(200).json({"message":"Server Online"});
 });
-publicRouter.post('/', function(req, res) {
-	res.status(200).json({"message":"Server Online"});
-});
 publicRouter.post('/new', User.createUser);
 publicRouter.post('/login', User.login);
 
-app.use('/pub', publicRouter);
+app.use('/', publicRouter);
 
 //Private Routes
 var privateRouter = express.Router();
 
 privateRouter.use(jwtauth);
-privateRouter.post('/users/search', User.searchUsers);
-privateRouter.get('/user/profile', User.userProfile);
+privateRouter.get('/users/search/:term', User.searchUsers);
+privateRouter.get('/users/profile/:id', User.userProfile);
 privateRouter.post('/friends', Friend.createFriend);
+privateRouter.put('/friends', Friend.confirmFriend);
+privateRouter.delete('/friends', Friend.destroyFriendship);
 privateRouter.post('/media', Media.postMedia);
-privateRouter.get('/activity', Activity.getActivity);
+privateRouter.get('/activity/:type', Activity.getActivity);
+privateRouter.get('/activityNewsfeed/:type', Activity.getActivityNewsfeed);
 
-app.use('/priv', privateRouter);
+app.use('/token', privateRouter);
 
 
 

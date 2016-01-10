@@ -44,7 +44,7 @@ exports.getFriends = function(req, res) {
 exports.findFriends = function(user) {
 	return new Promise(function(resolve, reject) {
 		var fetchedFriends = [];
-		User.find({ $or : [{ sender: user }, { recipient: user }] }, function(err, friends) {
+		Friend.find({ $or : [{ sender: user }, { recipient: user }] }, function(err, friends) {
 			if (err) {
 				console.log(err);
 				reject(err);
@@ -77,10 +77,11 @@ exports.confirmFriend = function(req, res) {
 exports.destroyFriendship = function(req, res) {
 	//either sender or recipient must be able to destroy
 	let destructor = req.user._id;
-	let destructed = req.user.destructed;
-
-	Friend.deleteOne({ $or : [{ sender: destructor, recipient: destructed }, { sender: destructed, recipient: destructor }]}, function(err, result) {
+	let destructed = req.body.destructed;
+	console.log("Friendship being destroyed, destructor: "+ destructor + " destructed: " + destructed);
+	Friend.remove({ $or : [{ sender: destructor, recipient: destructed }, { sender: destructed, recipient: destructor }]}, function(err, result) {
 		if (err) {
+			console.log("Error destroying friend: "+ err);
 			res.status(400).json({"message": "Error occured while destroying friend"});
 		} else {
 			console.log("friend destruction result: " + result);

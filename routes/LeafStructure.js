@@ -31,15 +31,14 @@ exports.clearStructuresForSeed = function() {
 	});
 }
 
-exports.getStructuresForActivity = function(activityType) {
-	return new Promise(function(resolve, reject) {
-		LeafStructure.find({ activityType: activityType }, function(err, structures) {
-			if (err) {
-				console.log(err);
-				reject(err);
-			} else {
-				resolve(structures);
-			}
-		});
+//hacky use of a callback, for some reason promises broken...
+exports.getStructuresForActivity = function(activityType, cb) {
+	LeafStructure.find({ activityType: activityType }, function(err, structures) {
+		if (err) {
+			console.log(err);
+			cb(err, null);
+		} else {
+			cb(null, structures);
+		}
 	});
 }

@@ -8,6 +8,8 @@ var Promise = require('bluebird');
 var jwt = require('jwt-simple');
 
 var User = require('../models/UserSchema.js');
+var LocalUser = require('./User.js');
+var Friend = require('./Friend.js');
 
 
 //MARK: Internal
@@ -23,6 +25,16 @@ exports.findUser = function (userId) {
 	});
 }
 
+function localFindUser(userId, cb) {
+  	User.findOne({ _id: userId }, function (err, user) {
+  		if (user) {
+  			cb(null, user);		  							  			
+  		} else {
+			cb(err, null);			  			
+  		}
+  	});
+}
+
 exports.attachUser = function(req, id) {
 	return new Promise(function(resolve, reject) {
 	  	User.findOne({ _id: id }, function (err, user) {
@@ -31,7 +43,7 @@ exports.attachUser = function(req, id) {
 	  			req.user = user;
 	  			resolve(user);		  							  			
 	  		} else {
-				reject(err);			  			
+				reject();			  			
 	  		}
 	  	});
 	});
@@ -113,13 +125,13 @@ exports.login = function(req, res) {
 }
 
 exports.searchUsers = function(req, res) {
-	var searchTerm = req.body.searchTerm
+	var searchTerm = req.params.term;
 	console.log("User Search Term: " +searchTerm);
 	User.find( {$or : [ {username: {$regex : searchTerm, $options: 'i'}}, {name: {$regex: searchTerm, $options: 'i'}} ] }, function(err, users) {
 		if (users) {
 			let info = [];
 			users.forEach(function(user){
-				info.push(userInfo(user));
+				info.push(LocalUser.userInfo(user));
 			});
 			res.status(200).json({"users": info});
 		} else {
@@ -130,21 +142,22 @@ exports.searchUsers = function(req, res) {
 
 exports.userProfile = function(req, res) {
 	let userData = {};
-	let viewing = req.body.viewing;
-	let userId = viewing != null ? viewing : req.user;
+	let userId = req.params.id != null ? req.params.id : req.user._id;
+	console.log("GENERATING USER PROFILE FOR: " +userId);
 
-	findUser(userId).then(function(user){
-		userData.userInfo = userInfo(user);
-	}).catch(function(err){
-		console.log("Error fetching user" + err);
+	localFindUser(userId, function(err, user){
+		if (err) {
+			console.log("Error fetching user " + user);
+			res.status(400).json({message: "Error fetching user"});
+		} else {
+			userData.userInfo = LocalUser.userInfo(user);
+				//Attach friend data
+			return Friend.findFriends(userId).then(function(fetchedFriends){
+				userData.friends = fetchedFriends;
+				res.status(200).json({"userData" : userData});
+			}).catch(function(err){
+				console.log("Error fetching friends" + err);
+			});
+		}
 	});
-
-	//Attach friend data
-	Friend.findFriends(req.user).then(function(fetchedFriends){
-		userData.friends = fetchedFriends;
-	}).catch(function(err){
-		console.log("Error fetching friends" + err);
-	});
-
-	res.status(200).json({"userData" : userData});
 }

@@ -16,11 +16,12 @@ exports.postMedia = function(req, res) {
 	let leafStructure = req.body.leafStructure;
 	let viewing = req.body.viewing;
 	let user = viewing != null ? viewing : req.user._id;
+	let mediaId = req.body.mediaInfo.mediaId;
 
 	var postedMedia = new Media({
 		user: user,
+		mediaId: mediaId,
 		mediaInfo: {
-			mediaId: req.body.mediaInfo.mediaId,
 			url: req.body.mediaInfo.url,
 			mediaType: req.body.mediaInfo.mediaType,
 		},
@@ -45,16 +46,15 @@ exports.postMedia = function(req, res) {
 }
 
 //MARK: LOCAL
-function fetchMediaWithIds(mediaIds) {
+exports.fetchMediaWithIds = function(mediaIds) {
 	return new Promise(function(resolve, reject) {
-		Media.find({_id: { $in: mediaIds }}, function(err, media) {
+		Media.find({mediaId: { $in: mediaIds }}, function(err, media) {
 			if (err) {
 				reject(err);
 			} else if (media) {
 				Comment.fetchComments(mediaIds).then(function(comments) {
-					var mediaInfo = { "media": media, "included" : comments };
+					var mediaInfo = { "media": media, "comments" : comments };
 					resolve(mediaInfo);
-					debugger;
 				});				
 			} else {
 				resolve({"media": [], "included" : []});

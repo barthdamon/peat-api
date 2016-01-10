@@ -80,12 +80,13 @@ exports.getData = function() {
 
 //MARK: Exports
 exports.isActivity = function(activityString) {
+	var found = false;
 	activities.forEach(function(activity){
 		if (activity = activityString) {
-			return true
+			found = true;
 		}
 	});
-	return false
+	return found;
 }
 
 
