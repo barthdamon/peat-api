@@ -9,8 +9,6 @@ var Media = require('../models/MediaSchema.js');
 var Comment = require('./Comment.js');
 var LeafFiller = require('./LeafFiller.js');
 
-var Leaf = require('./Leaf.js');
-
 exports.postMedia = function(req, res) {
 	console.log(req.body.mediaInfo.mediaId);
 	let currentTime = Date.now();
@@ -36,7 +34,7 @@ exports.postMedia = function(req, res) {
 		if(err) {
 			res.status(400).json({ "message": "media post failure: " + err });
 		} else {
-			LeafFiller.createFiller(leafStructure, mediaId, user).then(function(filler) {
+			LeafFiller.addMediaToFiller(leafStructure, mediaId, user).then(function(filler) {
 				res.status(201).json({ "message": "media created and added to leaf filler" });
 			}).catch(function(err) {
 				console.log("error adding media to filler: " + err);

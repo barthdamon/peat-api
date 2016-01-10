@@ -64,9 +64,9 @@ exports.getFillersForActivity = function(user, viewing, newsfeed) {
 			//fill for the users friends (need to get friends), newsfeed 
 			Friend.findFriends(user).then(function(friends){
 				let friendIds = [];
-				friends.forEach(friend) {
+				friends.forEach(function(friend) {
 					friendIds.push(friend._id);
-				}
+				});
 				findLeafFillers({user: { $in: friendIds }}).then(function(filling){
 					resolve(filling);
 				}).catch(function(err){

@@ -4,16 +4,16 @@ let express = require('express');
 let app = express();
 var Promise = require('bluebird');
 
-var LeafStructure = require('../models/LeafStructureSchema.js');
+var LeafStructure = require('./../models/LeafStructureSchema.js');
 
 exports.createStructuresFromSeedJson = function(structureArray) {
-		return new Promise(function(resolve, reject) {
+	return new Promise(function(resolve, reject) {
 		LeafStructure.create(structureArray, function(err, structures) {
 			if (err) {
 				console.log(err);
 				reject(err);
 			} else {
-				resolve(structures);
+				resolve();
 			}
 		});
 	});

@@ -41,7 +41,7 @@ exports.getFriends = function(req, res) {
 	});
 }
 
-exports.findFriends(user) {
+exports.findFriends = function(user) {
 	return new Promise(function(resolve, reject) {
 		var fetchedFriends = [];
 		User.find({ $or : [{ sender: user }, { recipient: user }] }, function(err, friends) {
