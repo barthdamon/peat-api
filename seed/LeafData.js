@@ -61,7 +61,35 @@ var snowboardingStructures = [
 	},
 ];
 
-exports.getData = function() {
+var snowboardingVariations = [
+	{
+		activity: "snowboarding",
+		ability: "360_id",
+		grouping: "Grabs",
+		title: "Indie",
+		mediaId: null,
+		custom: false
+	},
+	{
+		activity: "snowboarding",
+		ability: "360_id",
+		grouping: "Grabs",
+		title: "Melon",
+		mediaId: null,
+		custom: false
+	},
+	{
+		activity: "snowboarding",
+		ability: "Boardslide_id",
+		grouping: "Rail Type",
+		title: "Flat Box",
+		mediaId: null,
+		custom: false
+	},
+];
+
+
+exports.getStructureData = function() {
 	var dataStructures = [];
 	//apply each activity array do dataStructures
 	//snowboarding:
@@ -73,9 +101,23 @@ exports.getData = function() {
 	dataStructures.forEach(function(structure){
 		console.log("Activity: " + structure.activityType + ", Ability Title: " + structure.abilityTitle);
 	});
-	console.log('Structure JSON Parse Complete....')
+	console.log('Structure JSON Parse Complete....');
 	console.log();
 	return dataStructures;
+}
+
+exports.getVariationData = function() {
+	var dataVariations = [];
+	dataVariations.push.apply(dataVariations, snowboardingVariations);
+
+	console.log("Parsing Variation JSON....");
+	JSON.stringify(dataVariations);
+	dataVariations.forEach(function(variation){
+		console.log("Activity: " + variation.activityType + ", Grouping: " + variation.grouping + ", Title: " + variation.title);
+	});
+	console.log('Variation JSON Parse Complete....');
+	console.log();
+	return dataVariations;
 }
 
 //MARK: Exports

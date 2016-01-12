@@ -8,6 +8,7 @@ var Promise = require('bluebird');
 var Media = require('../models/MediaSchema.js');
 var Comment = require('./Comment.js');
 var LeafFiller = require('./LeafFiller.js');
+var Variation = require('./Variation.js');
 
 exports.postMedia = function(req, res) {
 	console.log(req.body.mediaInfo.mediaId);
@@ -28,7 +29,8 @@ exports.postMedia = function(req, res) {
 		meta: {
 			timestamp: currentTime,
 			description: req.body.meta.description,
-		}	
+			variation: req.body.meta.variation
+		}
 	});
 
 	postedMedia.save(function(err) {
@@ -53,11 +55,13 @@ exports.fetchMediaWithIds = function(mediaIds) {
 				reject(err);
 			} else if (media) {
 				Comment.fetchComments(mediaIds).then(function(comments) {
-					var mediaInfo = { "media": media, "comments" : comments };
-					resolve(mediaInfo);
+					return Variation.getVariationsForMedia(mediaIds).then(function(variations){
+						var mediaInfo = { media: media, variations: variations, comments : comments };
+						resolve(mediaInfo);
+					});
 				});				
 			} else {
-				resolve({"media": [], "included" : []});
+				resolve({media: [], variations: [], comments : []});
 			}
 		});
 	});

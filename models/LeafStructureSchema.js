@@ -12,9 +12,10 @@ var leafStructureSchema = mongoose.Schema({
 		y: Number
 	},
 	abilityTitle: String,
-	stableId: String,
+	stableId: { type: String, unique: true},
 	connections: [String],
-	demos: [String]
+	demos: [String],
+	variations: [String]
 });
 
 mongoose.model('LeafStructure', leafStructureSchema);

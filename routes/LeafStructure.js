@@ -21,7 +21,7 @@ exports.createStructuresFromSeedJson = function(structureArray) {
 
 exports.clearStructuresForSeed = function() {
 	return new Promise(function(resolve, reject) {
-		LeafStructure.remove({}, function(err, result){
+		return LeafStructure.remove({}, function(err, result){
 			if (err) {
 				reject(err);
 			} else {
