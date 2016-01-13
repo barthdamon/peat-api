@@ -7,20 +7,24 @@ part of a valid grouping.
 
 variations without mediaIds are the default variations seeded from json
 
-ability is the stableId of the ability
+structure is the stableId of the structure
 */
 
 let express = require('express');
 let app = express();
+
 var mongoose = require('mongoose');
+mongoose.Promise = require('bluebird');
 var db = require('../config/db.js');
 
 var variationSchema = mongoose.Schema({
 	activity: String,
-	ability: String,
-	grouping: String,
-	title: String,
+	leafStructure: String,
 	mediaId: String,
+	meta : {
+		grouping: String,
+		title: String
+	},
 	custom: Boolean
 });
 

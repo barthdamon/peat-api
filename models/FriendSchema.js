@@ -1,4 +1,5 @@
 'use strict';
+
 /*
 Description: Schema for defining friend relationships, which can be confirmed
 sender and recipient are the ids of users
@@ -10,6 +11,7 @@ let express = require('express');
 let app = express();
 
 var mongoose = require('mongoose');
+mongoose.Promise = require('bluebird');
 var db = require('../config/db.js');
 
 var friendSchema = mongoose.Schema({

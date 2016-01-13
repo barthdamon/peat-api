@@ -64,26 +64,32 @@ var snowboardingStructures = [
 var snowboardingVariations = [
 	{
 		activity: "snowboarding",
-		ability: "360_id",
-		grouping: "Grabs",
-		title: "Indie",
+		leafStructure: "360_id",
 		mediaId: null,
+		meta : {
+			grouping: "Grabs",
+			title: "Indie"
+		},
 		custom: false
 	},
 	{
 		activity: "snowboarding",
-		ability: "360_id",
-		grouping: "Grabs",
-		title: "Melon",
+		leafStructure: "360_id",
 		mediaId: null,
+		meta : {
+			grouping: "Grabs",
+			title: "Melon"
+		},
 		custom: false
 	},
 	{
 		activity: "snowboarding",
-		ability: "Boardslide_id",
-		grouping: "Rail Type",
-		title: "Flat Box",
+		leafStructure: "Boardslide_id",
 		mediaId: null,
+		meta : {
+			grouping: "Rail Type",
+			title: "Flat Box"
+		},
 		custom: false
 	},
 ];

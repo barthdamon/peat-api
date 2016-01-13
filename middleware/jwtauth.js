@@ -5,7 +5,7 @@ let express = require('express');
 let app = express();
 var jwt = require('jwt-simple');
 
-var User = require('./../routes/User.js');
+var User = require('./../models/UserSchema.js');
 
 //MARK: EXPORTS
 module.exports = function(req, res, next) {
@@ -31,11 +31,15 @@ module.exports = function(req, res, next) {
 		  	// if (decoded.exp < Date.now()) {
 		  	// 	res.status(300).json({"message" : "Auth Token Expired"})
 		  	// } else {
-
-		  	User.attachUser(req, decoded.iss).then(function(user) {
-		  		next();
-		  	}).catch(function(err) {
-				res.status(400).json({"message": "User not found for token: " + err});
+		  	let id = decoded.iss;
+			User.findOne({ _id: id }, function(err, user){
+				if (err) {
+					console.log("Error attaching User: " +err);
+					res.status(400).json({"message": "User not found for token: " + err});
+				} else {
+					req.user = user;
+					next();
+				}
 			});
 		} else {
 			res.status(400).json({"message" : "Invalid tokenAuth request format"});

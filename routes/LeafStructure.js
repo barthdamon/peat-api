@@ -5,6 +5,7 @@ let app = express();
 var Promise = require('bluebird');
 
 var LeafStructure = require('./../models/LeafStructureSchema.js');
+var Variation = require('./Variation.js');
 
 exports.createStructuresFromSeedJson = function(structureArray) {
 	return new Promise(function(resolve, reject) {
@@ -31,14 +32,6 @@ exports.clearStructuresForSeed = function() {
 	});
 }
 
-//hacky use of a callback, for some reason promises broken...
-exports.getStructuresForActivity = function(activityType, cb) {
-	LeafStructure.find({ activityType: activityType }, function(err, structures) {
-		if (err) {
-			console.log(err);
-			cb(err, null);
-		} else {
-			cb(null, structures);
-		}
-	});
+exports.getStructuresForActivity = function(activityType) {
+	LeafStructure.find({ activityType: activityType }).exec();
 }

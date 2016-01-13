@@ -7,7 +7,9 @@ It has comments, and other information
 
 let express = require('express');
 let app = express();
+
 var mongoose = require('mongoose');
+mongoose.Promise = require('bluebird');
 var db = require('../config/db.js');
 
 var mediaSchema = mongoose.Schema({

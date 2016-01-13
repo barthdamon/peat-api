@@ -1,4 +1,5 @@
 'use strict';
+
 /*
 Description: Base user schema
 */
@@ -8,6 +9,7 @@ let app = express();
 
 var mongoose = require('mongoose');
 var db = require('../config/db.js');
+mongoose.Promise = require('bluebird');
 var bcrypt = require('bcrypt');
 var SALT_WORK_FACTOR = 10;
 

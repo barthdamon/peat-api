@@ -7,7 +7,9 @@ Friend requests, notifications, and media completion notifications are counted h
 
 let express = require('express');
 let app = express();
+
 var mongoose = require('mongoose');
+mongoose.Promise = require('bluebird');
 var db = require('../config/db.js');
 
 var threadSchema = mongoose.Schema({
