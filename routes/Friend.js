@@ -24,9 +24,9 @@ exports.createFriend = function(req, res) {
 
 	newFriend.save(function(err) {
 		if (err) {
-			res.status(400).json({ "message": "friend create failure: " + err });
+			res.status(400).json({ message: "friend create failure: " + err });
 		} else {
-			res.status(200).json({ "message": "friend create success" });
+			res.status(200).json({ message: "friend create success" });
 		}
 	});
 }

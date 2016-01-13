@@ -52,6 +52,13 @@ app.use('/token', privateRouter);
 
 
 
+/*
+NOTE:
+Sockets are for threads, and for any other data updates the app has to handle (comments, media, ect).
+Sockets should emit messages when something is deleted, created, updated, or destroyed. 
+That way clients can update in the background depending on whatever happens.
+*/
+
 //MARK: SOCKET CONNECTIONS
 // io.on('connection', function(socket){
 //   console.log("Connected With Client");
