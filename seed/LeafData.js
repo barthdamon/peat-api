@@ -65,32 +65,36 @@ var snowboardingVariations = [
 	{
 		activity: "snowboarding",
 		leafStructure: "360_id",
-		mediaId: null,
-		meta : {
-			grouping: "Grabs",
-			title: "Indie"
-		},
+		grouping: "Grabs",
+		title: "Indie",
 		custom: false
 	},
 	{
 		activity: "snowboarding",
 		leafStructure: "360_id",
-		mediaId: null,
-		meta : {
-			grouping: "Grabs",
-			title: "Melon"
-		},
+		grouping: "Grabs",
+		title: "Melon",
 		custom: false
 	},
 	{
 		activity: "snowboarding",
 		leafStructure: "Boardslide_id",
-		mediaId: null,
-		meta : {
-			grouping: "Rail Type",
-			title: "Flat Box"
-		},
+		variationId: "Rails_Rainbow_id",
+		grouping: "Rails",
+		title: "Rainbow",
 		custom: false
+	},
+	{
+		activity: "snowboarding",
+		leafStructure: "180_id",
+		variationId: "Rails_Rainbow_id",
+		grouping: "Rails",
+		title: "Rainbow",
+		custom: false,
+		corresponding: {
+			"leafStructure": "RainBow_id",
+			"variation": "Rainbow"
+		}
 	},
 ];
 

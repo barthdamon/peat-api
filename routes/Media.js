@@ -1,4 +1,3 @@
-
 'use strict';
 
 let express = require('express');
@@ -6,8 +5,6 @@ let app = express();
 var Promise = require('bluebird');
 
 var Media = require('../models/MediaSchema.js');
-// var Comment = require('./Comment.js');
-// var Variation = require('./Variation.js');
 
 exports.postMedia = function(req, res) {
 	console.log(req.body.mediaInfo.mediaId);
@@ -16,20 +13,25 @@ exports.postMedia = function(req, res) {
 	let leafStructure = req.body.leafStructure;
 	let viewing = req.body.viewing;
 	let user = viewing != null ? viewing : req.user._id;
-	let mediaId = req.body.mediaInfo.mediaId;
+	let mediaId = req.body.mediaId;
+	let variationIds = req.body.variationIds;
+
+	//For each variationId on the medias variations array check if there is a variation with the variationId. If not, create it with a custom field of true.
+	//Then post the media with the variations array of the request, assuming the variations on the request are all created or valid (are found)
+
+	//in the future may want audio files too
 
 	var postedMedia = new Media({
-		user: user,
+		user_id: user,
 		mediaId: mediaId,
-		leafStructure: req.body.leafStructure,
+		variations: variationIds,
 		mediaInfo: {
 			url: req.body.mediaInfo.url,
-			mediaType: req.body.mediaInfo.mediaType,
+			mediaType: req.body.mediaInfo.mediaType
 		},
 		meta: {
 			timestamp: currentTime,
-			description: req.body.meta.description,
-			variation: req.body.meta.variation
+			description: req.body.meta.description
 		}
 	});
 

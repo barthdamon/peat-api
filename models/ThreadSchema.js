@@ -13,14 +13,14 @@ mongoose.Promise = require('bluebird');
 var db = require('../config/db.js');
 
 var threadSchema = mongoose.Schema({
-	sender: String,
-	recipient: String,
-	media: String,
+	sender_Id: String,
+	recipient_Id: String,
+	mediaId: String,
 	notification: Boolean,
 	request: Boolean,
 	text: String,
 	recieved: String,
-	history: [{ type: String, ref: 'Thread' }],
+	history_Ids: [String],
 	timestamp: Number,
 });
 

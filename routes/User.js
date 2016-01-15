@@ -8,33 +8,11 @@ var Promise = require('bluebird');
 var jwt = require('jwt-simple');
 
 var User = require('../models/UserSchema.js');
+var Profile = require('./../models/ProfileSchema.js');
 var LocalUser = require('./User.js');
 var Friend = require('./Friend.js');
 
-
 //MARK: Internal
-exports.findUser = function (userId) {
-	return new Promise(function(resolve, reject) {
-	  	User.findOne({ _id: userId }, function (err, user) {
-	  		if (user) {
-	  			resolve(user);		  							  			
-	  		} else {
-				reject(err);			  			
-	  		}
-	  	});
-	});
-}
-
-function localFindUser(userId, cb) {
-  	User.findOne({ _id: userId }, function (err, user) {
-  		if (user) {
-  			cb(null, user);		  							  			
-  		} else {
-			cb(err, null);			  			
-  		}
-  	});
-}
-
 exports.userInfo = function(user) {
 	return {
 		_id: user._id,
@@ -46,11 +24,6 @@ exports.userInfo = function(user) {
 }
 
 
-
-
-
-
-
 //MARK: External
 //New
 exports.createUser = function(req, res) {
@@ -59,22 +32,35 @@ exports.createUser = function(req, res) {
 	let username = req.body.user.username;
 	let email = req.body.user.email;
 	let password = req.body.user.password;
+	let currentTime = new Date();
 
 	let newUser = new User({
 		first: first,
 		last: last,
 		username: username,
 		email: email, 
-		password: password
+		password: password,
+		joined: currentTime
 	});
 
-	newUser.save(function(err) {
-		if (err) {
-			res.status(400).json({ "message": "user create failure: " + err });
-		} else {
-			res.status(200).json({ "message": "user create success" });
-		}
-	});
+	//When new user is created a user profile needs to be created as well
+	newUser.save()
+		.then(function(result){
+			return User.find({email: "email"}).exec()
+		})
+		.then(function(user){
+			let newProfile = new Profile({
+				user_Id: user._id,
+			});
+			return newProfile.save()
+		})
+		.then(function(result){
+			res.status(200).json({ message: "user create success" });
+		})
+		.catch(function(err){
+			res.status(400).json({ message: "user create failure: " + err });
+		})
+	.done();
 }
 
 //Basic Auth
@@ -82,9 +68,8 @@ exports.login = function(req, res) {
 	console.log(req.body.user.email);
 	User.findOne({ email: req.body.user.email }, function(err, user) {
 		if (user) {
-			// console.log(user);
-			var userId = user['id'];
-			// console.log(userID);
+			console.log("User account exists, attempting login for " + req.body.user.email);
+			var user_Id = user._id;
 			user.comparePassword(req.body.user.password, function(err, isMatch) {
         		if (err) {
         			res.status(403).json({"message": "User password incorrect"});
@@ -93,19 +78,19 @@ exports.login = function(req, res) {
 					var expires = date + 604800000;
 					//encode using the jwt token secret
 					var token = jwt.encode({
-					  	iss: userId,
+					  	iss: user_Id,
 					  	exp: expires
 					}, process.env.JWT_SECRET_TOKEN);
 
 					res.status(200).json({
 					  api_authtoken : token,
 					  authtoken_expiry: expires,
-					  user: user.userId
+					  user: user_Id
 					});
         		}
    		});
 		} else {
-			res.status(400).json({"message": "User not found"});
+			res.status(400).json({ message: "User not found"});
 		}
 	});
 }
@@ -119,31 +104,9 @@ exports.searchUsers = function(req, res) {
 			users.forEach(function(user){
 				info.push(LocalUser.userInfo(user));
 			});
-			res.status(200).json({"users": info});
+			res.status(200).json({ users: info});
 		} else {
-			res.status(400).json({"message": "Error finding users"});
-		}
-	});
-}
-
-exports.userProfile = function(req, res) {
-	let userData = {};
-	let userId = req.params.id != null ? req.params.id : req.user._id;
-	console.log("GENERATING USER PROFILE FOR: " +userId);
-
-	localFindUser(userId, function(err, user){
-		if (err) {
-			console.log("Error fetching user " + user);
-			res.status(400).json({message: "Error fetching user"});
-		} else {
-			userData.userInfo = LocalUser.userInfo(user);
-				//Attach friend data
-			return Friend.findFriends(userId).then(function(fetchedFriends){
-				userData.friends = fetchedFriends;
-				res.status(200).json({"userData" : userData});
-			}).catch(function(err){
-				console.log("Error fetching friends" + err);
-			});
+			res.status(400).json({ message: "Error finding users"});
 		}
 	});
 }

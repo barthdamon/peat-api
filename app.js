@@ -17,11 +17,13 @@ app.use(bodyParser.json());
 app.use(standardLogs);
 app.use(standardSecurity);
 
-//MARK: Models
+//Mark: Route Vars
 var User = require('./routes/User.js');
 var Media = require('./routes/Media.js');
 var Friend = require('./routes/Friend.js');
 var Activity = require('./routes/Activity.js');
+var Profile = require('./routes/Profile.js');
+var Follow = require('./routes/Follow.js');
 
 //MARK: ROUTES
 //Public Routes
@@ -39,14 +41,27 @@ app.use('/', publicRouter);
 var privateRouter = express.Router();
 
 privateRouter.use(jwtauth);
+
+//User Admin Related
+privateRouter.post('/friends/:id', Friend.createFriend);
+privateRouter.put('/friends/:id', Friend.confirmFriend);
+privateRouter.delete('/friends/:id', Friend.destroyFriendship);
+
+privateRouter.post('/follow/:id', Follow.newFollow);
+privateRouter.delete('/follow/:id', Follow.removeFollow);
+
+privateRouter.put('/users/profile/avatar', Profile.uploadAvatar);
+privateRouter.put('/users/profile/summary', Profile.uploadSummary);
+privateRouter.put('/users/profile/contact', Profile.uploadContact);
+
+//General
 privateRouter.get('/users/search/:term', User.searchUsers);
-privateRouter.get('/users/profile/:id', User.userProfile);
-privateRouter.post('/friends', Friend.createFriend);
-privateRouter.put('/friends', Friend.confirmFriend);
-privateRouter.delete('/friends', Friend.destroyFriendship);
+privateRouter.get('/users/profile/:id', Profile.userProfile);
+
+//Activity Related
 privateRouter.post('/media', Media.postMedia);
 privateRouter.get('/activity/:type', Activity.getActivity);
-privateRouter.get('/activityNewsfeed/:type', Activity.getActivityNewsfeed);
+// privateRouter.get('/activityNewsfeed/:type', Activity.getActivityNewsfeed);
 
 app.use('/token', privateRouter);
 
@@ -54,9 +69,7 @@ app.use('/token', privateRouter);
 
 /*
 NOTE:
-Sockets are for threads, and for any other data updates the app has to handle (comments, media, ect).
-Sockets should emit messages when something is deleted, created, updated, or destroyed. 
-That way clients can update in the background depending on whatever happens.
+Dont use sockets unless you have to, it drains the server.... send notifications using your notification service, duh
 */
 
 //MARK: SOCKET CONNECTIONS

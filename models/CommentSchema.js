@@ -13,9 +13,9 @@ mongoose.Promise = require('bluebird');
 var db = require('./../config/db.js');
 
 var commentSchema = mongoose.Schema({
-	sender: String,
-	media: String,
-	witnessEvent: Boolean,
+	sender_Id: String,
+	mediaId: String,
+	likeEvent: Boolean,
 	text: String,
 	timestamp: Number
 });

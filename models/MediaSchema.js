@@ -13,18 +13,16 @@ mongoose.Promise = require('bluebird');
 var db = require('../config/db.js');
 
 var mediaSchema = mongoose.Schema({
-	user: String,
-	mediaId: { type: String, unique: true},
+	user_Id: String,
+	mediaId: {type: String, unique: true},
 	leafStructure: String,
 	mediaInfo: {
 		url: String,
 		mediaType: String,
 	},
-	meta: {
-		timestamp: Number,
-		description: String,
-		variation: String
-	}
+	description: String,
+	location: String,
+	timestamp: Number
 });
 
 mongoose.model('Media', mediaSchema);

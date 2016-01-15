@@ -4,6 +4,8 @@
 Description: Schema for defining friend relationships, which can be confirmed
 sender and recipient are the ids of users
 
+progress NEEDS to be updated every time a users activity gets saved!
+
 timestamp is date requested until it is confirmed, then it becomes date confirmed
 */
 
@@ -14,14 +16,15 @@ var mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
 var db = require('../config/db.js');
 
-var friendSchema = mongoose.Schema({
-	sender_Id: String,
-	recipient_Id: String,
-	confirmed: Boolean,
-	timestamp: Number
+var profileSchema = mongoose.Schema({
+	user_Id: {type: String, unique: true},
+	summary: String,
+	avatarId: String,
+	contact: String,
+	progress: [{activity: String, completed: Number}]
 });
 
-mongoose.model('Friend', friendSchema);
-var Friend = db.model('Friend');
+mongoose.model('Profile', profileSchema);
+var Friend = db.model('Profile');
 
 module.exports = Friend;
