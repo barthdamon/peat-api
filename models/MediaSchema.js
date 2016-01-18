@@ -15,7 +15,7 @@ var db = require('../config/db.js');
 var mediaSchema = mongoose.Schema({
 	user_Id: String,
 	mediaId: {type: String, unique: true},
-	leafStructure: String,
+	leafId: String,
 	mediaInfo: {
 		url: String,
 		mediaType: String,

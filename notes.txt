@@ -1,0 +1,69 @@
+Newsfeed:
+
+
+Activity:
+	- perhaps in the future allow people to add whatever they want, but to start only have a few on there?
+	- activity review process? make sure nobody adds sex or anything like that. Or just literally have a massive list of activities. 
+	- Then say: If your activity isn't on here let us know! (quick form with activity name and description)
+
+	- hm...... how to do a newsfeed..... 
+	ideas:
+	- have the links of the media in a chain in the table view cell (previous - NEW)
+	- very simple, just list accomplishments and when user clicks it takes them to that tree ^previous new, connections listed in the newsfeed maybe in a mini screenshot or something?
+	
+
+	- will want to follow pros
+	- will want to witness pros' stunts
+	- theres gotta be a difference between crew and following? Or does there....... hmmmmmmm........
+	- yes, only your crew can be witnesses (so and so says he has witnessed you do this) - witness on a leaf or media? - probably the leaf, media gets likes
+	- will want to follow and witness their friends stunts.....
+
+Tree:
+	- based on a user
+	- activity
+	- totally customizable
+	- tap on screen to create a new leaf, tap and hold then drag to another box to connect leaves.
+	- lines can have directions, or they can be neutral (like you did one thing then the next)
+	- need to be able to group abilities, then draw lines from the group to other abilities or groups
+	- tap and hold on the line to reverse directions
+	- coordinates based on center
+
+	- saved when you upload media to an ability, or when user clicks save button
+
+
+Leaf:
+	- [media] (all doing the same thing - in the users eyes, its totally up to them)
+	- Coordinates
+	- connections
+	Description: Leaves are what users pull and manipulate and add media to in their tree. 
+	Users can add, remove, and change the relationships of leaves.
+	They can also group leaves into categories, like folders on an iphone.
+
+	Need to figure out:
+	When in a grouping, the coordinates of the leaf are based off of the coordinates of the grouping?
+	Or groupings just have color codes and can have links drawn from them and to other groupings....
+	Groupings could have moving goo around them that looks like liquid. when you click on the goo you get a name for the grouping
+	Groupings would then have to overlap. Would basically have to draw the goo over them. For now groupings can just be colors
+	z index determines which color is on top (others, which MUST be larger, would be on the bottom)
+
+	People should be able to totally customize all teh colors on their tree. The background, and the goo colors.
+
+	There need to be In progress leaves that you can create, but that are grayed out and have an in construction feel to them (like half filled with juice or something)
+
+	Different types of goo would be cool too!
+
+	status can be either Completed, Learning, Future Goal
+	--Future Goal is always faded gray, learning is more prominent gray and complete is white.
+	--background a deep black like the stars
+	--groupings can be any color people want them to be (except white and black)
+
+	- when you clump leaves, the media get combined into an array within the leaf.
+	Media:
+		- description
+		- location
+		- timestamp
+		- comments
+		- witness requests (you send to person who uploaded with a message. need to be their friend)
+
+FIRST the tree data structure is loaded. Then the activity fillers are loaded, 
+which are generated for either a user, or a users friends

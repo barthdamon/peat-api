@@ -21,7 +21,6 @@ var profileSchema = mongoose.Schema({
 	summary: String,
 	avatarId: String,
 	contact: String,
-	progress: [{activity: String, completed: Number}]
 });
 
 mongoose.model('Profile', profileSchema);

@@ -24,6 +24,8 @@ var Friend = require('./routes/Friend.js');
 var Activity = require('./routes/Activity.js');
 var Profile = require('./routes/Profile.js');
 var Follow = require('./routes/Follow.js');
+var Tree = require('./routes/Tree.js');
+var Leaf = require('./routes/Leaf.js');
 
 //MARK: ROUTES
 //Public Routes
@@ -58,10 +60,11 @@ privateRouter.put('/users/profile/contact', Profile.uploadContact);
 privateRouter.get('/users/search/:term', User.searchUsers);
 privateRouter.get('/users/profile/:id', Profile.userProfile);
 
-//Activity Related
+//Tree Related
 privateRouter.post('/media', Media.postMedia);
-privateRouter.get('/activity/:type', Activity.getActivity);
-// privateRouter.get('/activityNewsfeed/:type', Activity.getActivityNewsfeed);
+privateRouter.post('/leaf/new', Leaf.newLeaf);
+privateRouter.get('/tree/:activityName', Tree.getTree);
+privateRouter.get('/tree/leaves/:leafId', Leaf.getLeafData);
 
 app.use('/token', privateRouter);
 

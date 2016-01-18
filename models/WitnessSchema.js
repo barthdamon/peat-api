@@ -12,13 +12,15 @@ var mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
 var db = require('../config/db.js');
 
-var followSchema = mongoose.Schema({
-	follower_Id: String,
-	following_Id: String,
+var witnessSchema = mongoose.Schema({
+	witness_Id: String,
+	witnessed_Id: String,
+	leafId: String,
+	confirmed: Boolean,
 	timestamp: Number
 });
 
-mongoose.model('Follow', followSchema);
-var Follow = db.model('Follow');
+mongoose.model('Witness', witnessSchema);
+var Witness = db.model('Witness');
 
-module.exports = Follow;
+module.exports = Witness;

@@ -6,8 +6,7 @@ let app = express();
 var Promise = require('bluebird');
 var chalk = require('chalk');
 
-var Variation = require('./models/VariationSchema.js');
-var LeafStructure = require('./models/LeafStructureSchema.js');
+var Activity = require('./models/ActivitySchema.js');
 // var LeafStructureRoute = require('./routes/LeafStructure.js');
 var LeafData = require('./seed/LeafData.js');
 
@@ -15,26 +14,12 @@ console.log(chalk.magenta('Running seed database process'));
 console.log();
 
 //MARK: Script Actions
-var dataStructures = LeafData.getStructureData();
-var dataVariations = LeafData.getVariationData();
-console.log("LeafStructures to be seeded: " + dataStructures);
-console.log("Variations to be seeded: " + dataVariations);
+var presetActivities = LeafData.getActivityData();
+console.log("Preset activities to be seeded: " + presetActivities);
 
-LeafStructure.remove({}).exec()
+Activity.collection.insert(presetActivities)
 	.then(function(result){
-		console.log(chalk.green("SEED REPORT: LeafStructure Database Clear Successful: "+ result));
-		return LeafStructure.collection.insert(dataStructures)
-	})
-	.then(function(result){
-		console.log(chalk.green("SEED REPORT: LeafStructure Seed Successfully: " + result));
-		return Variation.remove({custom: false}).exec()
-	})
-	.then(function(result){
-		console.log(chalk.green("SEED REPORT: Variation Database Clear Successful: " + result));
-		return Variation.collection.insert(dataVariations)
-	})
-	.then(function(result){
-		console.log(chalk.green("SEED REPORT: Variation Database Seed Successful: " + result));
+		console.log(chalk.green("SEED REPORT: Preset Activity Database Seed Successful: " + result));
 		console.log();
 		process.exit();
 	})

@@ -12,14 +12,13 @@ var mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
 var db = require('./../config/db.js');
 
-var commentSchema = mongoose.Schema({
-	sender_Id: String,
-	mediaId: String,
-	text: String,
-	timestamp: Number
+var activitySchema = mongoose.Schema({
+	name: {type: String, unique: true},
+	category: String,
+	approved: Boolean
 });
 
-mongoose.model('Comment', commentSchema);
-var Comment = db.model('Comment');
+mongoose.model('Activity', activitySchema);
+var Activity = db.model('Activity');
 
-module.exports = Comment;
+module.exports = Activity;
