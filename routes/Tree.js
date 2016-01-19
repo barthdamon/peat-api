@@ -13,7 +13,7 @@ exports.getTree = function(req, res) {
 
 	var mediaIds = [];
 
-	Activity.find({ name: activityName }).exec()
+	Activity.findOne({ name: activityName }).exec()
 		.then(function(activity){
 			if (!activity.approved) {
 				throw "Activity not approved";
@@ -32,4 +32,21 @@ exports.getTree = function(req, res) {
 
 exports.saveTree = function(req, res) {
 	//save updated tree
+	let activityName = req.params.activityName;
+	Activity.findOne({ name: activityName }).exec()
+		.then(function(activity){
+			if (!activity.approved) {
+				throw "Activity not approved";
+			}
+			return Leaf.find({user_Id: user_Id, activityName: activityName}).exec()
+		})
+		.then(function(leaves){
+			//UPDATE LEAVES HERE
+			// res.status(200).json({treeInfo: {activityName: activityName, user: user_Id, leaves: leaves}});
+		})
+		.catch(function(err){
+			console.log("Error updating tree" + err);
+			res.status(400).json({message : "Error updating tree: " +err});
+		})
+	.done();
 }

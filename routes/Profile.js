@@ -20,7 +20,7 @@ exports.userProfile = function(req, res) {
 	let user_Id = req.params.id != null ? req.params.id : req.user._id;
 	console.log("Generating User Profile For: " +user_Id);
 
-	User.find({"_id": user_Id}).exec()
+	User.findOne({"_id": user_Id}).exec()
 		.then(function(user){
 			userData.userInfo = UserRoute.userInfo(user);
 			return Profile.find({"user_Id": user_Id}).exec()

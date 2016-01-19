@@ -11,7 +11,6 @@ var Comment = require('./../models/CommentSchema.js');
 var Like = require('./../models/LikeSchema.js');
 
 exports.newLeaf = function(req, res) {
-	console.log(req.body.mediaInfo.mediaId);
 	let currentTime = Date.now();
 	let leafId = req.body.leafId;
 
@@ -28,7 +27,7 @@ exports.newLeaf = function(req, res) {
 			connections: req.body.layout.connections,
 			groupings: req.body.layout.groupings
 		},
-		completionStatus: "Goal",
+		completionStatus: req.body.completionStatus,
 		title: req.body.title,
 		description: req.body.description,
 		timestamp: currentTime
@@ -48,7 +47,7 @@ exports.getLeafData = function(req, res) {
 	let leafId = req.params.leafId;
 	let user_Id = req.user._id;
 
-	var leafInfo = {};
+	var leafInfo = {mediaInfo:{}};
 
 	var commentIds = [];
 	var mediaIds = [];
@@ -56,13 +55,15 @@ exports.getLeafData = function(req, res) {
 	Leaf.findOne({ user_Id: user_Id, leafId: leafId }).exec()
 		.then(function(leaf){
 			leafInfo.leaf = leaf;
-			return Witness.find({leafId: leafId, witnessed_Id: user_Id}).exec()
+			return Witness.find({leafId: leafId}).exec()
 		})
 		.then(function(witnesses){
 			leafInfo.witnesses = witnesses;
-			return Media.find({leafId: leafId, user_Id: user_Id}).exec()
+			console.log("Searching media with leafId: " +leafId + ", user_Id: " + user_Id);
+			return Media.find({leafId: leafId}).exec()
 		})
 		.then(function(media){
+			console.log("MEDIA FOUND: " + media);
 			leafInfo.mediaInfo.media = media;
 			media.forEach(function(media){
 				mediaIds.push(media._id);
@@ -74,15 +75,15 @@ exports.getLeafData = function(req, res) {
 			comments.forEach(function(comment){
 				commentIds.push(comment._id);
 			});
-			return Like.find({user_Id: user_Id, mediaId: {$in: mediaIds}, commentId: {$in: commentIds} })
+			return Like.find({mediaId: {$in: mediaIds}, commentId: {$in: commentIds} })
 		})
 		.then(function(likes){
 			leafInfo.mediaInfo.likes = likes;
 			res.status(200).json(leafInfo);
 		})
 		.catch(function(err){
-			console.log("Error generating tree" + err);
-			res.status(400).json({message : "Error generating tree"});
+			console.log("Error generating leaf data: " + err);
+			res.status(400).json({message : "Error generating leaf data: " +err});
 		})
 	.done();
 

@@ -17,7 +17,7 @@ exports.postMedia = function(req, res) {
 	//For each variationId on the medias variations array check if there is a variation with the variationId. If not, create it with a custom field of true.
 	//Then post the media with the variations array of the request, assuming the variations on the request are all created or valid (are found)
 
-	//in the future may want audio files too
+	//in the future may want audio files, they shouldnt be able to just stick a link in. Media would get lost that way... unreliable and unprofessional
 	//all leaves store references to the leafIds, which get pulled in later
 	var postedMedia = new Media({
 		user_Id: req.user._id,

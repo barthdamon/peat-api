@@ -65,6 +65,7 @@ privateRouter.post('/media', Media.postMedia);
 privateRouter.post('/leaf/new', Leaf.newLeaf);
 privateRouter.get('/tree/:activityName', Tree.getTree);
 privateRouter.get('/tree/leaves/:leafId', Leaf.getLeafData);
+privateRouter.put('/tree/:activityName/update', Tree.saveTree);
 
 app.use('/token', privateRouter);
 
