@@ -33,16 +33,24 @@ exports.getTree = function(req, res) {
 exports.saveTree = function(req, res) {
 	//save updated tree
 	let activityName = req.params.activityName;
+	let leaves = req.body.leaves;
+	let user_Id = req.user._id;
+
+	var upd = function updateLeaf(leaf) {
+		update(leaf, user_Id);
+	}
+
 	Activity.findOne({ name: activityName }).exec()
 		.then(function(activity){
 			if (!activity.approved) {
 				throw "Activity not approved";
 			}
-			return Leaf.find({user_Id: user_Id, activityName: activityName}).exec()
+			let action = leaves.map(upd);
+			return Promise.promisifyAll(action, {multiArgs: true})
 		})
-		.then(function(leaves){
-			//UPDATE LEAVES HERE
-			// res.status(200).json({treeInfo: {activityName: activityName, user: user_Id, leaves: leaves}});
+		.then(function(){
+			//leaves sould be updated by here
+			res.status(200).json({message: "Tree update successful"});
 		})
 		.catch(function(err){
 			console.log("Error updating tree" + err);
@@ -50,3 +58,22 @@ exports.saveTree = function(req, res) {
 		})
 	.done();
 }
+
+
+
+
+function update(leaf, user_Id) {
+	console.log("leaf: " + JSON.stringify(leaf) + " user: " + user_Id);
+	return new Promise(function(resolve, reject) {
+		Leaf.update({leafId: leaf.leafId, user_Id: user_Id},leaf).exec()
+			.then(function(result){
+				resolve(result);
+				console.log("a leaf updated");
+			})
+			.catch(function(err) {
+				reject(err);
+			})
+		.done();
+	});
+}
+

@@ -96,7 +96,7 @@ exports.updateLeaf = function(req, res) {
 		} else {
 			res.status(200).json({message: "Leaf update successful"});
 		}
-	})
+	});
 }
 
 
