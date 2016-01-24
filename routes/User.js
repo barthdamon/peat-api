@@ -9,6 +9,7 @@ var jwt = require('jwt-simple');
 
 var User = require('../models/UserSchema.js');
 var Profile = require('./../models/ProfileSchema.js');
+var ProfileRoute = require('./Profile.js');
 var LocalUser = require('./User.js');
 var Friend = require('./Friend.js');
 
@@ -27,12 +28,12 @@ exports.userInfo = function(user) {
 //MARK: External
 //New
 exports.createUser = function(req, res) {
-	let first = req.body.user.first;
-	let last = req.body.user.last;
-	let username = req.body.user.username;
-	let email = req.body.user.email;
-	let password = req.body.user.password;
-	let currentTime = new Date();
+	let first = req.body.first;
+	let last = req.body.last;
+	let username = req.body.username;
+	let email = req.body.email;
+	let password = req.body.password;
+	let currentTime = Date.now();
 
 	let newUser = new User({
 		first: first,
@@ -43,19 +44,23 @@ exports.createUser = function(req, res) {
 		joined: currentTime
 	});
 
+	var user_Id = "";
+
 	//When new user is created a user profile needs to be created as well
 	newUser.save()
 		.then(function(result){
 			return User.find({email: "email"}).exec()
 		})
 		.then(function(user){
+			user_Id = user._id;
 			let newProfile = new Profile({
-				user_Id: user._id,
+				user_Id: user_Id,
 			});
 			return newProfile.save()
 		})
 		.then(function(result){
-			res.status(200).json({ message: "user create success" });
+			let token = generateToken(user_Id);
+			res.status(200).json(token);
 		})
 		.catch(function(err){
 			res.status(400).json({ message: "user create failure: " + err });
@@ -65,34 +70,40 @@ exports.createUser = function(req, res) {
 
 //Basic Auth
 exports.login = function(req, res) {
-	console.log(req.body.user.email);
-	User.findOne({ email: req.body.user.email }, function(err, user) {
+	console.log(req.body.emailUsername);
+	User.findOne({ $or: [{email: req.body.emailUsername}, {username: req.body.emailUsername}] }, function(err, user) {
 		if (user) {
-			console.log("User account exists, attempting login for " + req.body.user.email);
+			console.log("User account exists, attempting login for " + req.body.emailUsername);
 			var user_Id = user._id;
-			user.comparePassword(req.body.user.password, function(err, isMatch) {
+			user.comparePassword(req.body.password, function(err, isMatch) {
         		if (err) {
         			res.status(403).json({"message": "User password incorrect"});
         		} else {
-					var date = Date.now();
-					var expires = date + 604800000;
-					//encode using the jwt token secret
-					var token = jwt.encode({
-					  	iss: user_Id,
-					  	exp: expires
-					}, process.env.JWT_SECRET_TOKEN);
-
-					res.status(200).json({
-					  api_authtoken : token,
-					  authtoken_expiry: expires,
-					  user: user_Id
-					});
+        			var token = generateToken(user_Id);
+					res.status(200).json(token);
         		}
    		});
 		} else {
 			res.status(400).json({ message: "User not found"});
 		}
 	});
+}
+
+function generateToken(user_Id) {
+	var date = Date.now();
+	var expires = date + 604800000;
+	//encode using the jwt token secret
+	var token = jwt.encode({
+	  	iss: user_Id,
+	  	exp: expires
+	}, process.env.JWT_SECRET_TOKEN);
+
+	let tokenResponse = {
+	  api_authtoken : token,
+	  authtoken_expiry: expires		
+	} 
+
+	return tokenResponse
 }
 
 exports.searchUsers = function(req, res) {
