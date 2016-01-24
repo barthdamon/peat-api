@@ -63,6 +63,7 @@ privateRouter.get('/users/profile/:id', Profile.userProfile);
 //Tree Related
 privateRouter.post('/media', Media.postMedia);
 privateRouter.post('/leaf/new', Leaf.newLeaf);
+privateRouter.put('/leaf/update', Leaf.updateLeaf);
 privateRouter.get('/tree/:activityName', Tree.getTree);
 privateRouter.get('/tree/leaves/:leafId', Leaf.getLeafData);
 privateRouter.put('/tree/:activityName/update', Tree.saveTree);

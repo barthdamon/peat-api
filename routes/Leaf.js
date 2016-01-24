@@ -18,7 +18,6 @@ exports.newLeaf = function(req, res) {
 		user_Id: req.user._id,
 		activityName: req.body.activityName,
 		leafId: req.body.leafId,
-		mediaIds: null,
 		layout: {
 			coordinates: {
 				x: req.body.layout.coordinates.x,
@@ -89,19 +88,30 @@ exports.getLeafData = function(req, res) {
 
 }
 
-
-exports.changeLeafStatus = function(req, res) {
-	let completionStatus = req.body.completionStatus;
-	if (status == "Completed" || status == "Learning" || status == "Goal") {
-		Leaf.update({leafId: req.body.leafId, user_Id: req.user._id}, {completionStatus: completionStatus}, function(err, result) {
-			if (err) {
-				res.status(400).json({message: "Error updating completion status"});
-			} else {
-				res.status(200).json({message: "Completion status update successful"});
-			}
-		});
-	} else {
-		res.status(400).json({message: "Invalid completion status"});
-	}
+exports.updateLeaf = function(req, res) {
+	console.log("LEAF UPDATE REQUEST: " + JSON.stringify(req.body));
+	Leaf.update({leafId: req.body.leafId, user_Id: req.user._id}, {layout: req.body.layout, completionStatus: req.body.completionStatus, title: req.body.title, description: req.body.description}, function(err, result){
+		if (err) {
+			res.status(400).json({message: "Error updating leaf"});
+		} else {
+			res.status(200).json({message: "Leaf update successful"});
+		}
+	})
 }
+
+
+// exports.changeLeafStatus = function(req, res) {
+// 	let completionStatus = req.body.completionStatus;
+// 	if (status == "Completed" || status == "Learning" || status == "Goal") {
+// 		Leaf.update({leafId: req.body.leafId, user_Id: req.user._id}, {completionStatus: completionStatus}, function(err, result) {
+// 			if (err) {
+// 				res.status(400).json({message: "Error updating completion status"});
+// 			} else {
+// 				res.status(200).json({message: "Completion status update successful"});
+// 			}
+// 		});
+// 	} else {
+// 		res.status(400).json({message: "Invalid completion status"});
+// 	}
+// }
 
