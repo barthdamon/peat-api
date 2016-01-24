@@ -33,7 +33,8 @@ exports.getTree = function(req, res) {
 exports.saveTree = function(req, res) {
 	//save updated tree
 	let activityName = req.params.activityName;
-	let leaves = req.body.leaves;
+	let updates = req.body.updated;
+	let removals = req.body.removed;
 	let user_Id = req.user._id;
 
 	var upd = function updateLeaf(leaf) {
@@ -45,12 +46,19 @@ exports.saveTree = function(req, res) {
 			if (!activity.approved) {
 				throw "Activity not approved";
 			}
-			let action = leaves.map(upd);
+			let action = updates.map(upd);
 			return Promise.promisifyAll(action, {multiArgs: true})
 		})
 		.then(function(){
 			//leaves sould be updated by here
-			res.status(200).json({message: "Tree update successful"});
+			var removeLeafIds = [];
+			removals.forEach(function(removal){
+				removeLeafIds.push(removal.leafId);
+			})
+			return Leaf.remove({leafId: {$in: removeLeafIds}}).exec()
+		})
+		.then(function(){
+			res.status(200).json({message: "Tree update successful"});			
 		})
 		.catch(function(err){
 			console.log("Error updating tree" + err);
