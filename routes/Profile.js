@@ -18,6 +18,7 @@ var UserRoute = require('./User.js');
 exports.userProfile = function(req, res) {
 	let userData = {};
 	let user_Id = req.params.id != null ? req.params.id : req.user._id;
+	let needsMailbox = req.params.id != null ? false : true;
 	console.log("Generating User Profile For: " +user_Id);
 
 	User.findOne({"_id": user_Id}).exec()
@@ -31,28 +32,11 @@ exports.userProfile = function(req, res) {
 			return Friend.find({ $or: [{ sender_Id: user_Id }, { recipient_Id: user_Id }] }).exec()
 		})
 		.then(function(friends){
-			userData.friends = friends;
+			userData.friendIds = friends;
 			return Follow.find({"follower_Id": user_Id}).exec()
 		})
 		.then(function(following){
-			userData.following = following;
-			return Leaf.find({"user_Id": user_Id}).exec()
-		})
-		.then(function(leaves){
-			//Need to parse through.
-			// var activities = {};
-			leaves.forEach(function(leaf){
-				// if (activities[leaf.activityName]) {
-				// 	let activity = activities[leaf.activityName];
-				// 	activity[leaf.completionStatus] += 1;
-				// } else {
-					userData.activities[leaf.activityName][leaf.completionStatus] += 1;
-				// }
-			});
-			//want an array. Each item has an activity name and a number of leaves completed, learning, and goal field.
-			//first for each leaf add the activity name and 
-			// userData.progress = friends;
-			// return Follow.find({"follower_Id": user_Id}).exec()
+			userData.followingIds = following;
 			res.status(200).json({ userData: userData});
 		}).catch(function(err){
 			console.log("Error fetching user profile for " +user_Id + ": " + err);
@@ -62,7 +46,7 @@ exports.userProfile = function(req, res) {
 }
 
 exports.uploadAvatar = function(req, res) {
-	Profile.update({ 'user_Id' : req.user._id }, { 'avatarId' : req.body.avatarId }, function(err, result) {
+	Profile.update({ 'user_Id' : req.user._id }, { 'avatarUrl' : req.body.avatarUrl }, function(err, result) {
 		if (err) {
 			res.status(400).json({ message: "Error occured updating profile"});
 		} else {

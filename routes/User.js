@@ -49,7 +49,7 @@ exports.createUser = function(req, res) {
 	//When new user is created a user profile needs to be created as well
 	newUser.save()
 		.then(function(result){
-			return User.find({email: "email"}).exec()
+			return User.findOne({email: email}).exec()
 		})
 		.then(function(user){
 			user_Id = user._id;

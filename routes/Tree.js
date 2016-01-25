@@ -35,7 +35,10 @@ exports.saveTree = function(req, res) {
 	let activityName = req.params.activityName;
 	let updates = req.body.updated;
 	let removals = req.body.removed;
+	let newLeaves = req.body.newLeaves;
 	let user_Id = req.user._id;
+
+	console.log("NEW LEAVES: " + JSON.stringify(newLeaves));
 
 	var upd = function updateLeaf(leaf) {
 		update(leaf, user_Id);
@@ -58,7 +61,10 @@ exports.saveTree = function(req, res) {
 			return Leaf.remove({leafId: {$in: removeLeafIds}}).exec()
 		})
 		.then(function(){
-			res.status(200).json({message: "Tree update successful"});			
+			return Leaf.collection.insert(newLeaves)
+		})
+		.then(function(){
+			res.status(200).json({message: "Tree update successful"});	
 		})
 		.catch(function(err){
 			console.log("Error updating tree" + err);

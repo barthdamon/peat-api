@@ -58,7 +58,7 @@ privateRouter.put('/users/profile/contact', Profile.uploadContact);
 
 //General
 privateRouter.get('/users/search/:term', User.searchUsers);
-privateRouter.get('/users/profile/:id', Profile.userProfile);
+privateRouter.get('/users/profile', Profile.userProfile);
 
 //Tree Related
 privateRouter.post('/media', Media.postMedia);

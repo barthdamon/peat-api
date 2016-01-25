@@ -19,7 +19,7 @@ var db = require('../config/db.js');
 var profileSchema = mongoose.Schema({
 	user_Id: {type: String, unique: true},
 	summary: String,
-	avatarId: String,
+	avatarUrl: String,
 	contact: String,
 });
 
