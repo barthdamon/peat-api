@@ -98,7 +98,7 @@ exports.getFriends = function(req, res) {
 exports.destroyFriendship = function(req, res) {
 	//either sender or recipient must be able to destroy
 	let destructor = req.user._id;
-	let destructed = req.body.destructed;
+	let destructed = req.params.id;
 	console.log("Friendship being destroyed, destructor: "+ destructor + " destructed: " + destructed);
 	Friend.remove({ $or : [{ sender_Id: destructor, recipient_Id: destructed }, { sender_Id: destructed, recipient_Id: destructor }]}, function(err, result) {
 		if (err) {
