@@ -32,11 +32,11 @@ exports.userProfile = function(req, res) {
 			return Friend.find({ $or: [{ sender_Id: user_Id }, { recipient_Id: user_Id }] }).exec()
 		})
 		.then(function(friends){
-			userData.friendIds = friends;
+			userData.friends = friends;
 			return Follow.find({"follower_Id": user_Id}).exec()
 		})
 		.then(function(following){
-			userData.followingIds = following;
+			userData.following = following;
 			res.status(200).json({ userData: userData});
 		}).catch(function(err){
 			console.log("Error fetching user profile for " +user_Id + ": " + err);

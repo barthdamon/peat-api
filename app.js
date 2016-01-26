@@ -26,6 +26,7 @@ var Profile = require('./routes/Profile.js');
 var Follow = require('./routes/Follow.js');
 var Tree = require('./routes/Tree.js');
 var Leaf = require('./routes/Leaf.js');
+var Mailbox = require('./routes/Mailbox.js');
 
 //MARK: ROUTES
 //Public Routes
@@ -48,13 +49,16 @@ privateRouter.use(jwtauth);
 privateRouter.post('/friends/:id', Friend.createFriend);
 privateRouter.put('/friends/:id', Friend.confirmFriend);
 privateRouter.delete('/friends/:id', Friend.destroyFriendship);
+privateRouter.get('/friends/:id', Friend.getFriends);
 
-privateRouter.post('/follow/:id', Follow.newFollow);
+privateRouter.post('/follow/:id/:activity', Follow.newFollow);
 privateRouter.delete('/follow/:id', Follow.removeFollow);
 
 privateRouter.put('/users/profile/avatar', Profile.uploadAvatar);
 privateRouter.put('/users/profile/summary', Profile.uploadSummary);
 privateRouter.put('/users/profile/contact', Profile.uploadContact);
+
+privateRouter.get('/mail/requests', Mailbox.getRequests);
 
 //General
 privateRouter.get('/users/search/:term', User.searchUsers);
@@ -69,8 +73,6 @@ privateRouter.get('/tree/leaves/:leafId', Leaf.getLeafData);
 privateRouter.put('/tree/:activityName/update', Tree.saveTree);
 
 app.use('/token', privateRouter);
-
-
 
 /*
 NOTE:

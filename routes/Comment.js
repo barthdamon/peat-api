@@ -36,6 +36,8 @@ exports.newWitness = function(req, res) {
 		witness_Id: req.user._id,
 		witnessed_Id: req.body.witnessed_Id,
 		leafId: req.body.leafId,
+		message: req.body.message,
+		location: req.body.location,
 		confirmed: false,
 		timestamp: currentTime
 	});
@@ -57,7 +59,7 @@ exports.approveWitness = function(req, res) {
 		} else {
 			res.status(200).json({ message: "witness approve success" });
 		}
-	})
+	});
 }
 
 //MARK: Like

@@ -2,7 +2,7 @@
 
 /*
 Description: Schema for defining follow relationships, which are one way requests that basically
-cause a users newsfeed to be populated with the following person
+cause a users newsfeed to be populated with the tree they are following of another user
 */
 
 let express = require('express');
@@ -15,6 +15,7 @@ var db = require('../config/db.js');
 var followSchema = mongoose.Schema({
 	follower_Id: String,
 	following_Id: String,
+	followingActivity: String,
 	timestamp: Number
 });
 

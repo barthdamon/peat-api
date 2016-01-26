@@ -12,11 +12,13 @@ var User = require('./User.js');
 exports.newFollow = function(req, res) {
 	let follower = req.user._id;
 	let following = req.params.id;
+	let followingActivity = req.params.activity;
 	let currentTime = Date.now();
 
 	let newFollow = new Follow({
 		follower_Id: sender,
 		following_Id: recipient,
+		followingActivity: followingActivity,
 		timestamp: currentTime
 	});
 
