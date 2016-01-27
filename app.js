@@ -48,7 +48,8 @@ privateRouter.use(jwtauth);
 //User Admin Related
 privateRouter.post('/friends/:id', Friend.createFriend);
 privateRouter.put('/friends/:id', Friend.confirmFriend);
-privateRouter.delete('/friends/:id', Friend.destroyFriendship);
+privateRouter.put('/friends/remove/:id', Friend.destroyFriendship);
+privateRouter.put('/friends/reinitialize/:id', Friend.reinitializeFriend);
 privateRouter.get('/friends/:id', Friend.getFriends);
 
 privateRouter.post('/follow/:id/:activity', Follow.newFollow);
@@ -62,7 +63,7 @@ privateRouter.get('/mail/requests', Mailbox.getRequests);
 
 //General
 privateRouter.get('/users/search/:term', User.searchUsers);
-privateRouter.get('/users/profile', Profile.userProfile);
+privateRouter.get('/users/profile/:id', Profile.userProfile);
 
 //Tree Related
 privateRouter.post('/media', Media.postMedia);

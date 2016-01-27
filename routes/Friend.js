@@ -34,13 +34,29 @@ exports.createFriend = function(req, res) {
 	});
 }
 
+exports.reinitializeFriend = function(req, res) {
+	let recipient = req.params.id;
+	let reinitializer = req.user._id;
+	let currentTime = Date.now();
+
+	Friend.update({'endedBy_Id': reinitializer, $or : [{ sender_Id: reinitializer, recipient_Id: recipient }, { sender_Id: recipient, recipient_Id: reinitializer }]},
+		{endedBy_Id: "", sender_Id: reinitializer, recipient_Id: recipient}, function(err, result){
+		if (err) {
+			res.status(400).json({ message: "Error occured while reinitializing friend"});
+		} else {
+			console.log("friend reinitialization result: " + result);
+			res.status(200).json({ message: "Friend reinitialized"});
+		}
+	})
+}
+
 exports.confirmFriend = function(req, res) {
 	//user confirming must have recieved
 	let sender = req.params.id;
 	let recipient = req.user._id;
 	let currentTime = Date.now();
 
-	Friend.update({ 'sender_Id' : sender, 'recipient_Id' : recipient }, { 'confirmed' : true, 'timestamp' : currentTime }, function(err, result) {
+	Friend.update({ 'sender_Id' : sender, 'recipient_Id' : recipient }, { 'confirmed' : true, 'timestamp' : currentTime, 'endedBy_Id' : "" }, function(err, result) {
 		if (err) {
 		res.status(400).json({ message: "Error occured while confirming friend"});
 		} else {
@@ -55,17 +71,18 @@ exports.getFriends = function(req, res) {
 	let user_Id = req.params.id;
 	console.log("Id: "+ user_Id);
 	//This is where the user asks for all their friends
-	Friend.find({$or : [{ sender_Id: user_Id}, {recipient_Id: user_Id}], confirmed: true}).exec()
+	Friend.find({$or : [{ sender_Id: user_Id}, {recipient_Id: user_Id}]}).exec()
 		.then(function(friends){
 			console.log("friends: " + friends);
-			req.friends = friends;
+			let unconfirmedRelationships = [];
 			friends.forEach(function(friend){
-				if (friend.sender_Id != user_Id) {
-					user_Ids.push(friend.sender_Id);
+				if (friend.confirmed) {
+					user_Ids.push(friend.sender_Id != user_Id ? friend.sender_Id : friend.recipient_Id);
 				} else {
-					user_Ids.push(friend.recipient_Id);
+					unconfirmedRelationships.push(friend);
 				}
 			});
+			req.unconfirmedRelationships = unconfirmedRelationships;
 			return UserModel.find({"_id": {$in: user_Ids}}).exec()
 		})
 		.then(function(users){
@@ -86,7 +103,7 @@ exports.getFriends = function(req, res) {
 					}
 				})
 			})
-			res.status(200).json({friends: req.friends});
+			res.status(200).json({friends: req.friends, unconfirmedRelationships: req.unconfirmedRelationships});
 		})
 		.catch(function(err){
 			res.status(400).json({message: "Error getting friends: " + err});
@@ -94,13 +111,16 @@ exports.getFriends = function(req, res) {
 	.done();
 }
 
-//when user denies request same as destroying friendship
+//when user denies request same as destroying friendship. NO it should be an update that changes confirmed to false.
+//We need an ended by field on the friendship, or do we? YES. THen if that doesnt exist and the friendship is false that means the user still needs to confirm the friend request
 exports.destroyFriendship = function(req, res) {
 	//either sender or recipient must be able to destroy
 	let destructor = req.user._id;
 	let destructed = req.params.id;
 	console.log("Friendship being destroyed, destructor: "+ destructor + " destructed: " + destructed);
-	Friend.remove({ $or : [{ sender_Id: destructor, recipient_Id: destructed }, { sender_Id: destructed, recipient_Id: destructor }]}, function(err, result) {
+	Friend.update({ $or : [{ sender_Id: destructor, recipient_Id: destructed }, { sender_Id: destructed, recipient_Id: destructor }]},
+		{confirmed: false, endedBy_Id: req.user._id},
+		function(err, result) {
 		if (err) {
 			console.log("Error destroying friend: "+ err);
 			res.status(400).json({ message: "Error occured while destroying friend"});

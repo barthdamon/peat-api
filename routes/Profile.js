@@ -30,6 +30,7 @@ exports.userProfile = function(req, res) {
 			//Profile NEEDS to be updated every time an activity is saved.
 			userData.profile = profile;
 			return Friend.find({ $or: [{ sender_Id: user_Id }, { recipient_Id: user_Id }] }).exec()
+			//in the future, probably need to get all the friend and follow user_Info just to display
 		})
 		.then(function(friends){
 			userData.friends = friends;

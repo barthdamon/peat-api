@@ -18,7 +18,8 @@ var friendSchema = mongoose.Schema({
 	sender_Id: String,
 	recipient_Id: String,
 	confirmed: Boolean,
-	timestamp: Number
+	timestamp: Number,
+	endedBy_Id: String,
 });
 
 mongoose.model('Friend', friendSchema);

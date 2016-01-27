@@ -9,12 +9,11 @@ var jwt = require('jwt-simple');
 
 var User = require('../models/UserSchema.js');
 var Profile = require('./../models/ProfileSchema.js');
-var ProfileRoute = require('./Profile.js');
-var LocalUser = require('./User.js');
-var Friend = require('./Friend.js');
 
 //MARK: Internal
-exports.userInfo = function(user) {
+exports.userInfo = userInfo;
+
+function userInfo(user) {
 	return {
 		_id: user._id,
 		first: user.first,
@@ -109,15 +108,33 @@ function generateToken(user_Id) {
 exports.searchUsers = function(req, res) {
 	var searchTerm = req.params.term;
 	console.log("User Search Term: " +searchTerm);
-	User.find( {$or : [ {username: {$regex : searchTerm, $options: 'i'}}, {name: {$regex: searchTerm, $options: 'i'}} ] }, function(err, users) {
-		if (users) {
-			let info = [];
-			users.forEach(function(user){
-				info.push(LocalUser.userInfo(user));
+	var user_Ids = [];
+
+	User.find({$or : [ {username: {$regex : searchTerm, $options: 'i'}}, {first: {$regex: searchTerm, $options: 'i'}}, {last: {$regex: searchTerm, $options: 'i'}}] }).exec()
+		.then(function(userModels){
+			console.log("users: " +userModels);
+			var users = [];
+			userModels.forEach(function(user){
+				users.push({userInfo: userInfo(user)});
+				user_Ids.push(user._id);
 			});
-			res.status(200).json({ users: info});
-		} else {
-			res.status(400).json({ message: "Error finding users"});
-		}
-	});
+			req.users = users;
+			return Profile.find({"user_Id": {$in: user_Ids}}).exec()
+		})
+		.then(function(profiles){
+			console.log("profiles: " + profiles);
+			profiles.forEach(function(profile){
+				req.users.forEach(function(user){
+					if (user.userInfo._id == profile.user_Id) {
+						user.profile = profile;
+					}
+				})
+			})
+	 		res.status(200).json({ users: req.users});
+		})
+		.catch(function(err){
+			console.log(err);
+	 		res.status(400).json({ message: "Error finding users"});
+		})
+	.done();
 }

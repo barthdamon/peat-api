@@ -25,4 +25,3 @@ exports.getRequests = function(req, res) {
 		})
 	.done();
 }
-
