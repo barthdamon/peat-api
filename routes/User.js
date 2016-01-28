@@ -11,8 +11,7 @@ var User = require('../models/UserSchema.js');
 var Profile = require('./../models/ProfileSchema.js');
 
 //MARK: Internal
-exports.userInfo = userInfo;
-
+exports.userInfo =  userInfo;
 function userInfo(user) {
 	return {
 		_id: user._id,
@@ -112,25 +111,25 @@ exports.searchUsers = function(req, res) {
 
 	User.find({$or : [ {username: {$regex : searchTerm, $options: 'i'}}, {first: {$regex: searchTerm, $options: 'i'}}, {last: {$regex: searchTerm, $options: 'i'}}] }).exec()
 		.then(function(userModels){
-			console.log("users: " +userModels);
-			var users = [];
+			var userInfos = [];
 			userModels.forEach(function(user){
-				users.push({userInfo: userInfo(user)});
+				userInfos.push({userInfo: userInfo(user)});
 				user_Ids.push(user._id);
 			});
-			req.users = users;
+			req.userInfos = userInfos;
+			console.log("user ids: " + user_Ids);
 			return Profile.find({"user_Id": {$in: user_Ids}}).exec()
 		})
 		.then(function(profiles){
 			console.log("profiles: " + profiles);
 			profiles.forEach(function(profile){
-				req.users.forEach(function(user){
+				req.userInfos.forEach(function(user){
 					if (user.userInfo._id == profile.user_Id) {
 						user.profile = profile;
 					}
 				})
 			})
-	 		res.status(200).json({ users: req.users});
+	 		res.status(200).json({ users: req.userInfos});
 		})
 		.catch(function(err){
 			console.log(err);
