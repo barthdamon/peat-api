@@ -23,10 +23,12 @@ exports.userProfile = function(req, res) {
 
 	User.findOne({"_id": user_Id}).exec()
 		.then(function(user){
+			console.log(user);
 			userData.userInfo = UserRoute.userInfo(user);
-			return Profile.find({"user_Id": user_Id}).exec()
+			return Profile.findOne({"user_Id": user_Id}).exec()
 		})
 		.then(function(profile){
+			console.log(profile);
 			//Profile NEEDS to be updated every time an activity is saved.
 			userData.profile = profile;
 			return Friend.find({ $or: [{ sender_Id: user_Id }, { recipient_Id: user_Id }] }).exec()

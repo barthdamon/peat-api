@@ -53,31 +53,4 @@ exports.getRequests = function(req, res) {
 			res.status(400).json({message: "Error getting friends: " + err});
 		})
 	.done();
-
-
-	// Friend.find({recipient_Id: user_Id, confirmed: false}).exec()
-	// 	.then(function(friends){
-	// 		req.friendRequests = friends;
-	// 		friends.forEach(function(friend){
-	// 			user_Ids.push(friend._id);
-	// 		})
-	// 		return Witness.find({witnessed_Id: user_Id, confirmed: false}).exec()
-	// 	})
-	// 	.then(function(witnesses){
-	// 		witnesses.forEach(function(witness){
-	// 			user_Ids.push(witness._id);
-	// 		})
-	// 	})
-	// 	.then(function(users){
-
-	// 	})
-	// 	.then(function(profiles){
-
-	// 		res.status(200).json({witnessRequests: witnesses, friendRequests: req.friendRequests});
-	// 	})
-	// 	//also need all the users for both of these......
-	// 	.catch(function(err){
-	// 		res.status(400).json({message: "Error getting mailbox"});
-	// 	})
-	// .done();
 }
