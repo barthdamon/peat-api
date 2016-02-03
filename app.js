@@ -63,7 +63,8 @@ privateRouter.get('/mail/requests', Mailbox.getRequests);
 
 //General
 privateRouter.get('/users/search/:term', User.searchUsers);
-privateRouter.get('/users/profile/:id', Profile.userProfile);
+privateRouter.get('/currentUser/profile', Profile.currentUserProfile);
+privateRouter.get('/user/profile/:id', Profile.userProfile);
 
 //Tree Related
 privateRouter.post('/media', Media.postMedia);

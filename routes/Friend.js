@@ -58,6 +58,7 @@ exports.confirmFriend = function(req, res) {
 
 	Friend.update({ 'sender_Id' : sender, 'recipient_Id' : recipient }, { 'confirmed' : true, 'timestamp' : currentTime, 'endedBy_Id' : "" }, function(err, result) {
 		if (err) {
+		console.log("Error confirming friend: " + err);
 		res.status(400).json({ message: "Error occured while confirming friend"});
 		} else {
 			console.log("friend confirmation result: " + result);

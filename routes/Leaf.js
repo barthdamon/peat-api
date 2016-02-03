@@ -23,8 +23,7 @@ exports.newLeaf = function(req, res) {
 				x: req.body.layout.coordinates.x,
 				y: req.body.layout.coordinates.y
 			},
-			connections: req.body.layout.connections,
-			groupings: req.body.layout.groupings
+			groupingId: req.body.layout.grouping
 		},
 		completionStatus: req.body.completionStatus,
 		title: req.body.title,

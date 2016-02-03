@@ -79,7 +79,7 @@ exports.saveTree = function(req, res) {
 function update(leaf, user_Id) {
 	console.log("leaf: " + JSON.stringify(leaf) + " user: " + user_Id);
 	return new Promise(function(resolve, reject) {
-		Leaf.update({leafId: leaf.leafId, user_Id: user_Id},leaf).exec()
+		Leaf.update({leafId: leaf.leafId, user_Id: user_Id}, leaf).exec()
 			.then(function(result){
 				resolve(result);
 				console.log("a leaf updated");

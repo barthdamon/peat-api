@@ -15,8 +15,7 @@ var leafSchema = mongoose.Schema({
 			x: Number,
 			y: Number
 		},
-		connections: [{leafId: String, type: String,}],
-		groupings: [{name: String, color: String, zIndex: Number}]
+		groupingId: String
 	},
 	completionStatus: String,
 	title: String,
