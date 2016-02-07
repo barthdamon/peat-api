@@ -138,34 +138,53 @@ exports.searchUsers = function(req, res) {
 	.done();
 }
 
-exports.userProfileForId = function(id) {
+exports.userProfilesForIds = function(ids) {
+	var userInfos = [];
 	return new Promise(function(resolve, reject) {
-		User.findOne({_id: id}).exec()
-			.then(function(userModels){
-				var userInfos = [];
-				userModels.forEach(function(user){
-					userInfos.push({userInfo: userInfo(user)});
-					user_Ids.push(user._id);
-				});
-				req.userInfos = userInfos;
-				console.log("user ids: " + user_Ids);
-				return Profile.find({"user_Id": {$in: user_Ids}}).exec()
-			})
-			.then(function(profiles){
-				console.log("profiles: " + profiles);
-				profiles.forEach(function(profile){
-					req.userInfos.forEach(function(user){
-						if (user.userInfo._id == profile.user_Id) {
-							user.profile = profile;
-						}
-					})
+		User.find({_id: {$in: ids}}).exec()
+		.then(function(userModels){
+			userModels.forEach(function(user){
+				userInfos.push({userInfo: userInfo(user)});
+			});
+			return Profile.find({"user_Id": {$in: ids}}).exec()
+		})
+		.then(function(profiles){
+			console.log("profiles: " + profiles);
+			profiles.forEach(function(profile){
+				userInfos.forEach(function(user){
+					if (user.userInfo._id == profile.user_Id) {
+						user.profile = profile;
+					}
 				})
-		 		res.status(200).json({ user: req.userInfos});
 			})
-			.catch(function(err){
-				console.log(err);
-		 		res.status(400).json({ message: "Error finding users"});
-			})
-		.done();
+			console.log("USERINFOS GENERATED: " + JSON.stringify(userInfos));
+	 		resolve(userInfos);
+		})
+		.catch(function(err){
+	 		reject(err);
+		})
+	.done();
 	});
 }
+
+// exports.userProfileForId = function(id) {
+// 	return new Promise(function(resolve, reject) {
+// 		var info = {};
+
+// 		User.findOne({_id: id}).exec()
+// 			.then(function(user){
+// 				console.log("USER FOUND: ::" + user);
+// 				info = userInfo(user);
+// 				var user_Id = user._id;
+// 				return Profile.findOne({"user_Id": user_Id}).exec()
+// 			})
+// 			.then(function(profile){
+// 				info.profile = profile
+// 		 		resolve(info);
+// 			})
+// 			.catch(function(err){
+// 				reject(err);
+// 			})
+// 		.done();
+// 	});
+// }

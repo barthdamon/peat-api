@@ -7,6 +7,7 @@ var Promise = require('bluebird');
 var Media = require('../models/MediaSchema.js');
 var Comment = require('./../models/CommentSchema.js');
 var Like = require('./../models/LikeSchema.js');
+var User = require('./User.js');
 
 
 exports.postMedia = function(req, res) {
@@ -45,14 +46,30 @@ exports.postMedia = function(req, res) {
 
 exports.getMediaForLeaf = function(leafId) {
 	var mediaInfo = {};
+
+	// var commentProfiles = function attachCommentProfiles(comment) {
+	// 	return new Promise(function(resolve, reject) {
+	// 		User.userProfileForId(comment.sender_Id)
+	// 			.then(function(userProfile){
+	// 				comment.userProfile = userProfile;
+	// 				resolve(comment);
+	// 			})
+	// 			.catch(function(err){
+	// 				reject(err);
+	// 			})
+	// 		.done();
+	// 	});
+	// }
+
+	var commentIds = [];
+	var mediaIds = [];
+	var user_Ids = [];
 		
 	return new Promise(function(resolve, reject) {
-		var commentIds = [];
-		var mediaIds = [];
 
 		Media.find({leafId: leafId}).exec()
 			.then(function(media){
-				console.log("MEDIA FOUND: " + JSON.stringify(media));
+				// console.log("MEDIA FOUND: " + JSON.stringify(media));
 				mediaInfo.media = media;
 				media.forEach(function(media){
 					mediaIds.push(media.mediaId);
@@ -60,6 +77,7 @@ exports.getMediaForLeaf = function(leafId) {
 				return Comment.find({mediaId: {$in: mediaIds}}).exec()
 			})
 			.then(function(comments){
+				// console.log("DECORATED COMMENTS: " + comments);
 				comments.forEach(function(comment){
 					commentIds.push(comment._id);
 					mediaInfo.media.forEach(function(media){
@@ -69,7 +87,7 @@ exports.getMediaForLeaf = function(leafId) {
 						}
 					})
 				});
-				console.log("mediaIds: " + JSON.stringify(mediaIds));
+				// console.log("mediaIds: " + JSON.stringify(mediaIds));
 				return Like.find({$or: [{mediaId: {$in: mediaIds}}, {commentId: {$in: commentIds}}] }).exec()
 			})
 			.then(function(likes){
@@ -77,17 +95,38 @@ exports.getMediaForLeaf = function(leafId) {
 					mediaInfo.media.forEach(function(media){
 						media._doc.likes = [];
 						if (like.mediaId == media.mediaId) {
+							user_Ids.push(like.user_Id);
 							media._doc.likes.push(like);
 						}
 						media._doc.comments.forEach(function(comment){
 							if (like.comment_Id == comment._id) {
+								user_Ids.push(comment.sender_Id);
 								media.likes.push(like);
 							}
 						})
 					})
 				})
-				console.log("likes: " + JSON.stringify(likes));
-				console.log("MEDIA SENT: " + JSON.stringify(mediaInfo));
+				// console.log("likes: " + JSON.stringify(likes));
+				return User.userProfilesForIds(user_Ids)
+			})
+			.then(function(userInfos){
+				userInfos.forEach(function(info){
+					mediaInfo.media.forEach(function(media){
+						media._doc.comments.forEach(function(comment){
+							if (comment.sender_Id == info.userInfo._id) {
+								comment._doc.userInfo = info;
+								console.log("comment connected");
+							}
+						})
+						media._doc.likes.forEach(function(like){
+							if (like.user_Id == info.userInfo._id) {
+								like._doc.userInfo = info;
+								console.log("Like connected");
+							}
+						})
+					})
+				})
+				// console.log("MEDIA SENT: " + JSON.stringify(mediaInfo));
 				resolve(mediaInfo);
 			})
 			.catch(function(err){
