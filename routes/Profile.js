@@ -50,8 +50,7 @@ exports.currentUserProfile = function(req, res) {
 
 exports.userProfile = function(req, res) {
 	let userData = {};
-	let user_Id = req.params.id;
-	let needsMailbox = req.params.id != null ? false : true;
+	let user_Id = req.params.id != null ? req.params.id : req.user._id;
 	console.log("Generating User Profile For: " +user_Id);
 
 	User.findOne({"_id": user_Id}).exec()

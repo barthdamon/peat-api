@@ -11,15 +11,15 @@ var Grouping = require('./../models/GroupingSchema.js');
 
 exports.getTree = function(req, res) {
 	let activityName = req.params.activityName;
-	let user_Id = req.body.viewing != null ? req.body.viewing : req.user._id;
+	let user_Id = req.params.id;
 
 	var mediaIds = [];
 
 	Activity.findOne({ name: activityName }).exec()
 		.then(function(activity){
-			if (!activity.approved) {
-				throw "Activity not approved";
-			}
+			// if (!activity.approved) {
+			// 	throw "Activity not approved";
+			// }
 			return Leaf.find({user_Id: user_Id, activityName: activityName}).exec()
 		})
 		.then(function(leaves){
@@ -28,7 +28,7 @@ exports.getTree = function(req, res) {
 		})
 		.then(function(connections){
 			req.connections = connections;
-			Grouping.find({user_Id: user_Id, activityName: activityName}).exec()
+			return Grouping.find({user_Id: user_Id, activityName: activityName}).exec()
 		})
 		.then(function(groupings){
 			res.status(200).json({activityName: activityName, user: user_Id, leaves: req.leaves, connections: req.connections, groupings: groupings});
@@ -57,7 +57,7 @@ exports.saveTree = function(req, res) {
 	let groupingRemovals = req.body.removedGroupings;
 	let newGroupings = req.body.newGroupings;
 
-	console.log("NEW LEAVES: " + JSON.stringify(newLeaves));
+	console.log("NEW LEAVES: " + JSON.stringify(newLeaves) + "NEW CONNECTIONS:" + JSON.stringify(newConnections));
 
 	var leafUpd = function updateLeaf(leaf) {
 		leafUpdate(leaf, user_Id);
@@ -76,6 +76,7 @@ exports.saveTree = function(req, res) {
 			}
 			let action = leafUpdates.map(leafUpd);
 			return Promise.promisifyAll(action, {multiArgs: true})
+			console.log("here1");
 		})
 		.then(function(){
 			//leaves sould be updated by here
@@ -83,40 +84,59 @@ exports.saveTree = function(req, res) {
 			leafRemovals.forEach(function(removal){
 				removeLeafIds.push(removal.leafId);
 			})
+						console.log("here2");
 			return Leaf.remove({leafId: {$in: removeLeafIds}}).exec()
 		})
 		.then(function(){
-			return Leaf.collection.insert(newLeaves)
+						console.log("here3");
+			if (newLeaves.length > 0) {
+				return Leaf.collection.insert(newLeaves)
+			} else {
+				return
+			}
 		})
 		.then(function(){
 			let action = connectionUpdates.map(connectionUpd);
+						console.log("here4");
 			return Promise.promisifyAll(action, {multiArgs: true})
 		})
 		.then(function(){
 			//leaves sould be updated by here
 			var removeConnectionIds = [];
 			connectionRemovals.forEach(function(removal){
-				removeConnectionIds.push(removal._id);
+				removeConnectionIds.push(removal.connectionId);
 			})
-			return Connection.remove({_id: {$in: removeConnectionIds}}).exec()
+						console.log("here5");
+			return Connection.remove({connectionId: {$in: removeConnectionIds}}).exec()
 		})
 		.then(function(){
-			return Connection.collection.insert(newConnections)
+						console.log("here6");
+			if (newConnections.length > 0) {
+				return Connection.collection.insert(newConnections)
+			} else {
+				return
+			}
 		})
 		.then(function(){
+									console.log("here7");
 			let action = groupingUpdates.map(groupingUpd);
 			return Promise.promisifyAll(action, {multiArgs: true})
 		})
 		.then(function(){
-			//leaves sould be updated by here
 			var removeGroupingIds = [];
 			groupingRemovals.forEach(function(removal){
 				removeGroupingIds.push(removal.groupingId);
 			})
+						console.log("here8");
 			return Grouping.remove({groupingId: {$in: removeGroupingIds}}).exec()
 		})
 		.then(function(){
-			return Grouping.collection.insert(newGroupings)
+						console.log("here9");
+			if (newGroupings.length > 0) {
+				return Grouping.collection.insert(newGroupings)
+			} else {
+				return
+			}
 		})
 		.then(function(){
 			res.status(200).json({message: "Tree update successful"});	
@@ -149,7 +169,7 @@ function leafUpdate(leaf, user_Id) {
 function connectionUpdate(connection, user_Id) {
 	console.log("connection: " + JSON.stringify(connection) + " user: " + user_Id);
 	return new Promise(function(resolve, reject) {
-		Connection.update({_id: connection._id, user_Id: user_Id}, connection).exec()
+		Connection.update({connectionId: connection.connectionId, user_Id: user_Id}, connection).exec()
 			.then(function(result){
 				resolve(result);
 				console.log("a connection updated");

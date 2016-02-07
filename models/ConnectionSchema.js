@@ -7,6 +7,7 @@ mongoose.Promise = require('bluebird');
 var db = require('./../config/db.js');
 
 var connectionSchema = mongoose.Schema({
+	connectionId: String,
 	user_Id: String,
 	activityName: String,
 	type: String,
@@ -14,7 +15,7 @@ var connectionSchema = mongoose.Schema({
 	fromId: String,
 });
 
-mongoose.model('Leaf', connectionSchema);
+mongoose.model('Connection', connectionSchema);
 var Connection = db.model('Connection');
 
 module.exports = Connection;

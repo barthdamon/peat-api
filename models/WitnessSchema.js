@@ -16,9 +16,6 @@ var witnessSchema = mongoose.Schema({
 	witness_Id: String,
 	witnessed_Id: String,
 	leafId: String,
-	confirmed: Boolean,
-	message: String,
-	location: String,
 	timestamp: Number
 });
 

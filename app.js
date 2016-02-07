@@ -27,6 +27,7 @@ var Follow = require('./routes/Follow.js');
 var Tree = require('./routes/Tree.js');
 var Leaf = require('./routes/Leaf.js');
 var Mailbox = require('./routes/Mailbox.js');
+var Witness = require('./routes/Witness.js');
 
 //MARK: ROUTES
 //Public Routes
@@ -61,6 +62,10 @@ privateRouter.put('/users/profile/contact', Profile.uploadContact);
 
 privateRouter.get('/mail/requests', Mailbox.getRequests);
 
+privateRouter.post('/witness/new', Witness.createWitness);
+// privateRouter.put('/witness/confirm/:id', Witness.confirmWitness);
+privateRouter.delete('/witness/remove/:id', Witness.destroyWitness);
+
 //General
 privateRouter.get('/users/search/:term', User.searchUsers);
 privateRouter.get('/currentUser/profile', Profile.currentUserProfile);
@@ -70,8 +75,8 @@ privateRouter.get('/user/profile/:id', Profile.userProfile);
 privateRouter.post('/media', Media.postMedia);
 privateRouter.post('/leaf/new', Leaf.newLeaf);
 privateRouter.put('/leaf/update', Leaf.updateLeaf);
-privateRouter.get('/tree/:activityName', Tree.getTree);
-privateRouter.get('/tree/leaves/:leafId', Leaf.getLeafData);
+privateRouter.get('/tree/:activityName/:id', Tree.getTree);
+privateRouter.get('/leaves/:leafId', Leaf.getLeafData);
 privateRouter.put('/tree/:activityName/update', Tree.saveTree);
 
 app.use('/token', privateRouter);
