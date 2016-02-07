@@ -18,12 +18,9 @@ module.exports = function(req, res, next) {
 		if (token) {
 		  	try {
 	   		decoded = jwt.decode(token, process.env.JWT_SECRET_TOKEN);
-	   		debugger;
 		  	} catch (err) {
 		  		res.status(401).json({"message" : "Incorrect Auth Token: "+err});
-		  		debugger;
 		  	}
-		  	debugger;
 		  	console.log(decoded);
 
 		  	// get user id from the db, check to make sure the exp isn't invalid

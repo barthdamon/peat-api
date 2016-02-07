@@ -6,9 +6,7 @@ var Promise = require('bluebird');
 
 var Leaf = require('../models/LeafSchema.js');
 var Witness = require('./../models/WitnessSchema.js');
-var Media = require('../models/MediaSchema.js');
-var Comment = require('./../models/CommentSchema.js');
-var Like = require('./../models/LikeSchema.js');
+var Media = require('./Media.js');
 
 exports.newLeaf = function(req, res) {
 	let currentTime = Date.now();
@@ -47,9 +45,6 @@ exports.getLeafData = function(req, res) {
 
 	var leafInfo = {mediaInfo:{}};
 
-	var commentIds = [];
-	var mediaIds = [];
-
 	Leaf.findOne({ user_Id: user_Id, leafId: leafId }).exec()
 		.then(function(leaf){
 			leafInfo.leaf = leaf;
@@ -58,25 +53,10 @@ exports.getLeafData = function(req, res) {
 		.then(function(witnesses){
 			leafInfo.witnesses = witnesses;
 			console.log("Searching media with leafId: " +leafId + ", user_Id: " + user_Id);
-			return Media.find({leafId: leafId}).exec()
+			return Media.getMediaForLeaf(leafId)
 		})
-		.then(function(media){
-			console.log("MEDIA FOUND: " + media);
-			leafInfo.mediaInfo.media = media;
-			media.forEach(function(media){
-				mediaIds.push(media._id);
-			});
-			return Comment.find({mediaId: {$in: mediaIds}}).exec()
-		})
-		.then(function(comments){
-			leafInfo.mediaInfo.comments = comments;
-			comments.forEach(function(comment){
-				commentIds.push(comment._id);
-			});
-			return Like.find({mediaId: {$in: mediaIds}, commentId: {$in: commentIds} })
-		})
-		.then(function(likes){
-			leafInfo.mediaInfo.likes = likes;
+		.then(function(mediaInfo){
+			leafInfo.mediaInfo = mediaInfo;
 			res.status(200).json(leafInfo);
 		})
 		.catch(function(err){

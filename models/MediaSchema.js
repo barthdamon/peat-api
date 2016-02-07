@@ -16,7 +16,7 @@ var mediaSchema = mongoose.Schema({
 	user_Id: String,
 	mediaId: String,
 	leafId: String,
-	mediaInfo: {
+	source: {
 		url: String,
 		mediaType: String,
 	},
