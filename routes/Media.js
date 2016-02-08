@@ -67,14 +67,14 @@ exports.getMediaForLeaf = function(leafId) {
 		
 	return new Promise(function(resolve, reject) {
 
-		Media.find({leafId: leafId}).exec()
+		Media.find({$query: {leafId: leafId}, $orderby: { timestamp : -1 }}).exec()
 			.then(function(media){
 				// console.log("MEDIA FOUND: " + JSON.stringify(media));
 				mediaInfo.media = media;
 				media.forEach(function(media){
 					mediaIds.push(media.mediaId);
 				});
-				return Comment.find({mediaId: {$in: mediaIds}}).exec()
+				return Comment.find({$query: {mediaId: {$in: mediaIds}}, $orderby: { timestamp : -1 }}).exec()
 			})
 			.then(function(comments){
 				// console.log("DECORATED COMMENTS: " + comments);
@@ -115,13 +115,11 @@ exports.getMediaForLeaf = function(leafId) {
 						media._doc.comments.forEach(function(comment){
 							if (comment.sender_Id == info.userInfo._id) {
 								comment._doc.userInfo = info;
-								console.log("comment connected");
 							}
 						})
 						media._doc.likes.forEach(function(like){
 							if (like.user_Id == info.userInfo._id) {
 								like._doc.userInfo = info;
-								console.log("Like connected");
 							}
 						})
 					})
