@@ -77,26 +77,32 @@ exports.getMediaForLeaf = function(leafId) {
 				return Comment.find({$query: {mediaId: {$in: mediaIds}}, $orderby: { timestamp : -1 }}).exec()
 			})
 			.then(function(comments){
-				// console.log("DECORATED COMMENTS: " + comments);
+				console.log("DECORATED COMMENTS: " + comments);
 				comments.forEach(function(comment){
 					commentIds.push(comment._id);
 					mediaInfo.media.forEach(function(media){
-						media._doc.comments = [];
 						if (comment.mediaId == media.mediaId) {
-							media._doc.comments.push(comment);
+							if (media._doc.comments) {
+								media._doc.comments.push(comment);
+							} else {
+								media._doc.comments = [comment];
+							}
+							// console.log("mediaCommentss: " + JSON.stringify(media._doc.comments));
 						}
 					})
 				});
-				// console.log("mediaIds: " + JSON.stringify(mediaIds));
 				return Like.find({$or: [{mediaId: {$in: mediaIds}}, {commentId: {$in: commentIds}}] }).exec()
 			})
 			.then(function(likes){
 				likes.forEach(function(like){
 					mediaInfo.media.forEach(function(media){
-						media._doc.likes = [];
 						if (like.mediaId == media.mediaId) {
 							user_Ids.push(like.user_Id);
-							media._doc.likes.push(like);
+							if (media._doc.likes) {
+								media._doc.likes.push(like);
+							} else {
+								media._doc.likes = [like];
+							}
 						}
 						media._doc.comments.forEach(function(comment){
 							if (like.comment_Id == comment._id) {
