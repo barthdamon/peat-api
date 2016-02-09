@@ -11,7 +11,6 @@ var User = require('./User.js');
 
 
 exports.postMedia = function(req, res) {
-	console.log(req.body.mediaInfo.mediaId);
 	let currentTime = Date.now();
 	//Leaf structure MUST be the stableId of the leaf
 	let leafId = req.body.leafId;
