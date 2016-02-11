@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "seed": "NODE_ENV=development node seed.js",
+    "prodSeed": "node seed.js",
     "debug": "NODE_ENV=development API_PASSWORD=fartpoop JWT_SECRET_TOKEN=secretStringFTW node debug app.js",
     "dev": "NODE_ENV=development API_PASSWORD=fartpoop JWT_SECRET_TOKEN=secretStringFTW nodemon app.js",
     "start": "node app.js"
