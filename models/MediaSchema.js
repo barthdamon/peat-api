@@ -22,6 +22,7 @@ var mediaSchema = mongoose.Schema({
 	},
 	description: String,
 	location: String,
+	purpose: String,
 	timestamp: Number
 });
 

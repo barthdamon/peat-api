@@ -20,6 +20,7 @@ var leafSchema = mongoose.Schema({
 	completionStatus: String,
 	title: String,
 	description: String,
+	tip: String,
 	timestamp: Number
 });
 

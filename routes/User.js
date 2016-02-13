@@ -18,7 +18,8 @@ function userInfo(user) {
 		first: user.first,
 		last: user.last,
 		username: user.username,
-		email: user.email
+		email: user.email,
+		type: user.type
 	};
 }
 
@@ -31,6 +32,7 @@ exports.createUser = function(req, res) {
 	let username = req.body.username;
 	let email = req.body.email;
 	let password = req.body.password;
+	let type = req.body.type;
 	let currentTime = Date.now();
 
 	let newUser = new User({
@@ -39,6 +41,7 @@ exports.createUser = function(req, res) {
 		username: username,
 		email: email, 
 		password: password,
+		type: type,
 		joined: currentTime
 	});
 

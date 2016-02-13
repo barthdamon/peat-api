@@ -26,6 +26,7 @@ exports.newLeaf = function(req, res) {
 		completionStatus: req.body.completionStatus,
 		title: req.body.title,
 		description: req.body.description,
+		tip: req.body.tip,
 		timestamp: currentTime
 	});
 
@@ -69,7 +70,7 @@ exports.getLeafData = function(req, res) {
 
 exports.updateLeaf = function(req, res) {
 	console.log("LEAF UPDATE REQUEST: " + JSON.stringify(req.body));
-	Leaf.update({leafId: req.body.leafId, user_Id: req.user._id}, {layout: req.body.layout, completionStatus: req.body.completionStatus, title: req.body.title, description: req.body.description}, function(err, result){
+	Leaf.update({leafId: req.body.leafId, user_Id: req.user._id}, {layout: req.body.layout, completionStatus: req.body.completionStatus, title: req.body.title, description: req.body.description, tip: req.body.tip}, function(err, result){
 		if (err) {
 			res.status(400).json({message: "Error updating leaf"});
 		} else {

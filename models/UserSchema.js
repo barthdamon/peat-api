@@ -2,6 +2,16 @@
 
 /*
 Description: Base user schema
+
+valid types are:
+
+single - can be sponsored by organizations (this goes in the profile)
+organization - organizations can have their atheltes or their own instructional videos if they want to. users can send
+sponsor and admin requests to users and vice versa. Then if the user is an admin they can edit the organizations tree, if they
+are sponsored they get that on their profile......
+
+for organizations there is no first or last name, only the username (name of the organization)
+
 */
 
 let express = require('express');
@@ -20,6 +30,7 @@ var userSchema = mongoose.Schema({
 	username: { type: String, unique: true},
 	email: { type: String, unique: true }, 
 	password: String,
+	type: String,
 	joined: Number
 });
 

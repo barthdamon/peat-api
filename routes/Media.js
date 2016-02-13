@@ -30,6 +30,7 @@ exports.postMedia = function(req, res) {
 			mediaType: req.body.source.mediaType
 		},
 		description: req.body.description,
+		purpose: req.body.purpose,
 		location: req.body.location,
 		timestamp: currentTime
 	});
