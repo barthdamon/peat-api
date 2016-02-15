@@ -21,6 +21,7 @@ var profileSchema = mongoose.Schema({
 	summary: String,
 	avatarUrl: String,
 	contact: String,
+	primaryActivity: String
 });
 
 mongoose.model('Profile', profileSchema);
