@@ -29,6 +29,7 @@ var Leaf = require('./routes/Leaf.js');
 var Mailbox = require('./routes/Mailbox.js');
 var Witness = require('./routes/Witness.js');
 var Comment = require('./routes/Comment.js');
+var News = require('./routes/News.js');
 
 //MARK: ROUTES
 //Public Routes
@@ -71,7 +72,13 @@ privateRouter.get('/users/search/:term', User.searchUsers);
 privateRouter.get('/currentUser/profile', Profile.currentUserProfile);
 privateRouter.get('/user/profile/:id', Profile.userProfile);
 
+//News
+privateRouter.get('/news/:activityName/:abilityName', News.getLeafFeed);
+
 //Tree Related
+privateRouter.get('/activities/:activityTerm', Activity.searchActivities);
+privateRouter.get('/abilities/:activityName/:abilityTerm', Leaf.findExistingAbility);
+
 privateRouter.post('/media', Media.postMedia);
 privateRouter.post('/media/comment/new', Comment.createComment);
 privateRouter.post('/media/like/new', Comment.newLike);

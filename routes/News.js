@@ -15,8 +15,8 @@ exports.getNewsfeed = function(req, res) {
 }
 
 exports.getLeafFeed = function(req, res) {
-	let abilityName = req.body.abilityName;
-	let activityName = req.body.activityName;
+	let abilityName = req.params.abilityName;
+	let activityName = req.params.activityName;
 	let user_Id = req.user._id;
 
 	Activity.findOne({ name: activityName }).exec()

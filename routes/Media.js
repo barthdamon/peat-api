@@ -15,6 +15,7 @@ exports.postMedia = function(req, res) {
 	//Leaf structure MUST be the stableId of the leaf
 	let leafId = req.body.leafId;
 	let mediaId = req.body.mediaId;
+	let ability_Id = req.body.ability_Id;
 
 	//For each variationId on the medias variations array check if there is a variation with the variationId. If not, create it with a custom field of true.
 	//Then post the media with the variations array of the request, assuming the variations on the request are all created or valid (are found)
@@ -25,6 +26,7 @@ exports.postMedia = function(req, res) {
 		user_Id: req.user._id,
 		mediaId: mediaId,
 		leafId: leafId,
+		ability_Id: ability_Id,
 		source: {
 			url: req.body.source.url,
 			mediaType: req.body.source.mediaType

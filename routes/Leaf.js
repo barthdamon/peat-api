@@ -8,6 +8,7 @@ var Leaf = require('../models/LeafSchema.js');
 var Witness = require('./../models/WitnessSchema.js');
 var Media = require('./Media.js');
 var Ability = require('./../models/AbilitySchema.js');
+var Activity = require('./../models/ActivitySchema.js');
 
 exports.newLeaf = function(req, res) {
 	let currentTime = Date.now();
@@ -36,7 +37,7 @@ exports.newLeaf = function(req, res) {
 					groupingId: req.body.layout.grouping
 				},
 				completionStatus: req.body.completionStatus,
-				title: req.body.title,
+				abilityName: req.body.abilityName,
 				description: req.body.description,
 				tip: req.body.tip,
 				timestamp: currentTime
@@ -55,7 +56,7 @@ exports.newLeaf = function(req, res) {
 
 function abilityCheck(id, name, activity) {
 	return new Promise(function(resolve, reject) {
-		if (ability_Id != null) {
+		if (ability_Id != "") {
 			resolve();
 		} else {
 			var newAbility = new Ability({
@@ -104,7 +105,7 @@ exports.getLeafData = function(req, res) {
 
 exports.updateLeaf = function(req, res) {
 	console.log("LEAF UPDATE REQUEST: " + JSON.stringify(req.body));
-	Leaf.update({leafId: req.body.leafId, user_Id: req.user._id}, {layout: req.body.layout, completionStatus: req.body.completionStatus, title: req.body.title, description: req.body.description, tip: req.body.tip}, function(err, result){
+	Leaf.update({leafId: req.body.leafId, user_Id: req.user._id}, {layout: req.body.layout, completionStatus: req.body.completionStatus, abilityName: req.body.abilityName, description: req.body.description, tip: req.body.tip}, function(err, result){
 		if (err) {
 			res.status(400).json({message: "Error updating leaf"});
 		} else {
@@ -114,8 +115,8 @@ exports.updateLeaf = function(req, res) {
 }
 
 exports.findExistingAbility = function(req, res) {
-	let abilityTerm = req.body.abilityTerm;
-	let activityName = req.body.activityName;
+	let abilityTerm = req.params.abilityTerm;
+	let activityName = req.params.activityName;
 
 	Activity.findOne({ name: activityName }).exec()
 		.then(function(activity){

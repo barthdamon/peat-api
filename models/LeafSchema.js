@@ -18,7 +18,7 @@ var leafSchema = mongoose.Schema({
 		groupingId: String
 	},
 	completionStatus: String,
-	title: String,
+	abilityName: String,
 	description: String,
 	tip: String,
 	timestamp: Number
