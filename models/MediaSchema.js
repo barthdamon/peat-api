@@ -16,6 +16,7 @@ var mediaSchema = mongoose.Schema({
 	user_Id: String,
 	mediaId: String,
 	leafId: String,
+	ability_Id: String,
 	source: {
 		url: String,
 		mediaType: String,
