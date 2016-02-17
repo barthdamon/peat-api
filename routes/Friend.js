@@ -9,7 +9,6 @@ var Promise = require('bluebird');
 var Friend = require('./../models/FriendSchema.js');
 var User = require('./User.js');
 var UserModel = require('./../models/UserSchema.js');
-var Profile = require('./../models/ProfileSchema.js');
 
 exports.createFriend = function(req, res) {
 	let sender = req.user._id;
@@ -91,20 +90,7 @@ exports.getFriends = function(req, res) {
 			users.forEach(function(user){
 				friends.push({userInfo: User.userInfo(user)});
 			});
-			req.friends = friends;
-			console.log("users: " +users);
-			return Profile.find({"user_Id": {$in: user_Ids}}).exec()
-		})
-		.then(function(profiles){
-			console.log("profiles: " + profiles);
-			profiles.forEach(function(profile){
-				req.friends.forEach(function(friend){
-					if (friend.userInfo._id == profile.user_Id) {
-						friend.profile = profile;
-					}
-				})
-			})
-			res.status(200).json({friends: req.friends, unconfirmedRelationships: req.unconfirmedRelationships});
+			res.status(200).json({friends: friends, unconfirmedRelationships: req.unconfirmedRelationships});
 		})
 		.catch(function(err){
 			res.status(400).json({message: "Error getting friends: " + err});

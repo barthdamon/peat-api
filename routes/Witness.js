@@ -9,7 +9,6 @@ var Promise = require('bluebird');
 var Witness = require('./../models/WitnessSchema.js');
 var User = require('./User.js');
 var UserModel = require('./../models/UserSchema.js');
-var Profile = require('./../models/ProfileSchema.js');
 
 exports.createWitness = function(req, res) {
 	let witness = req.user._id;

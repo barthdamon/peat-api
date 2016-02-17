@@ -8,7 +8,6 @@ var Promise = require('bluebird');
 var jwt = require('jwt-simple');
 
 var User = require('../models/UserSchema.js');
-var Profile = require('./../models/ProfileSchema.js');
 
 //MARK: Internal
 exports.userInfo =  userInfo;
@@ -19,7 +18,8 @@ function userInfo(user) {
 		last: user.last,
 		username: user.username,
 		email: user.email,
-		type: user.type
+		type: user.type,
+		profile: user.profile
 	};
 }
 
@@ -42,25 +42,20 @@ exports.createUser = function(req, res) {
 		email: email, 
 		password: password,
 		type: type,
-		joined: currentTime
+		joined: currentTime,
+		profile: {
+			contact: email,
+		}
 	});
 
 	var user_Id = "";
 
-	//When new user is created a user profile needs to be created as well
 	newUser.save()
 		.then(function(result){
 			return User.findOne({email: email}).exec()
 		})
 		.then(function(user){
-			user_Id = user._id;
-			let newProfile = new Profile({
-				user_Id: user_Id,
-			});
-			return newProfile.save()
-		})
-		.then(function(result){
-			let token = generateToken(user_Id);
+			let token = generateToken(user._id);
 			res.status(200).json(token);
 		})
 		.catch(function(err){
@@ -117,21 +112,7 @@ exports.searchUsers = function(req, res) {
 			var userInfos = [];
 			userModels.forEach(function(user){
 				userInfos.push({userInfo: userInfo(user)});
-				user_Ids.push(user._id);
 			});
-			req.userInfos = userInfos;
-			console.log("user ids: " + user_Ids);
-			return Profile.find({"user_Id": {$in: user_Ids}}).exec()
-		})
-		.then(function(profiles){
-			console.log("profiles: " + profiles);
-			profiles.forEach(function(profile){
-				req.userInfos.forEach(function(user){
-					if (user.userInfo._id == profile.user_Id) {
-						user.profile = profile;
-					}
-				})
-			})
 	 		res.status(200).json({ users: req.userInfos});
 		})
 		.catch(function(err){
@@ -142,25 +123,13 @@ exports.searchUsers = function(req, res) {
 }
 
 exports.userProfilesForIds = function(ids) {
-	var userInfos = [];
 	return new Promise(function(resolve, reject) {
 		User.find({_id: {$in: ids}}).exec()
-		.then(function(userModels){
-			userModels.forEach(function(user){
+		.then(function(users){
+			var userInfos = [];
+			users.forEach(function(user){
 				userInfos.push({userInfo: userInfo(user)});
 			});
-			return Profile.find({"user_Id": {$in: ids}}).exec()
-		})
-		.then(function(profiles){
-			console.log("profiles: " + profiles);
-			profiles.forEach(function(profile){
-				userInfos.forEach(function(user){
-					if (user.userInfo._id == profile.user_Id) {
-						user.profile = profile;
-					}
-				})
-			})
-			console.log("USERINFOS GENERATED: " + JSON.stringify(userInfos));
 	 		resolve(userInfos);
 		})
 		.catch(function(err){

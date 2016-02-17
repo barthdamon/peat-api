@@ -35,12 +35,16 @@ exports.approveActivity = function(req, res) {
 
 exports.searchActivities = function(req, res) {
 	let activityTerm = req.params.activityTerm;
+	console.log("Searching for activities with: " + activityTerm);
 
-	Activity.find({name: {$regex : activityTerm, $options: 'i'}}).limit(5), function(err, activities){
-		if (err) {
-			res.status(400).json({"message": "Error finding existing abilities"});
-		} else {
+	Activity.find({name: {$regex : activityTerm, $options: 'i'}}).limit(5).exec()
+		.then(function(activities){
+			console.log("Activities found: " + activities);
 			res.status(200).json({"activities": activities});
-		}
-	}
+		})
+		.catch(function(err){
+			console.log("Error searching activities");
+			res.status(400).json({"message": "Error finding existing abilities"});
+		})
+	.done();
 }

@@ -31,7 +31,13 @@ var userSchema = mongoose.Schema({
 	email: { type: String, unique: true }, 
 	password: String,
 	type: String,
-	joined: Number
+	joined: Number,
+	profile: {
+		summary: String,
+		avatarUrl: String,
+		contact: String,
+		activeActivityNames: [String]
+	}
 });
 
 userSchema.pre('save', function(next) {

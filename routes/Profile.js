@@ -11,7 +11,6 @@ and then their activities and how many leaves they have completed in each one.
 */
 var Friend = require('./../models/FriendSchema.js');
 var Follow = require('./../models/FollowSchema.js');
-var Profile = require('./../models/ProfileSchema.js');
 var User = require('./../models/UserSchema.js');
 var UserRoute = require('./User.js');
 
@@ -25,12 +24,6 @@ exports.currentUserProfile = function(req, res) {
 		.then(function(user){
 			console.log(user);
 			userData.userInfo = UserRoute.userInfo(user);
-			return Profile.findOne({"user_Id": user_Id}).exec()
-		})
-		.then(function(profile){
-			console.log(profile);
-			//Profile NEEDS to be updated every time an activity is saved.
-			userData.profile = profile;
 			return Friend.find({ $or: [{ sender_Id: user_Id }, { recipient_Id: user_Id }] }).exec()
 			//in the future, probably need to get all the friend and follow user_Info just to display
 		})
@@ -57,12 +50,6 @@ exports.userProfile = function(req, res) {
 		.then(function(user){
 			console.log(user);
 			userData.userInfo = UserRoute.userInfo(user);
-			return Profile.findOne({"user_Id": user_Id}).exec()
-		})
-		.then(function(profile){
-			console.log(profile);
-			//Profile NEEDS to be updated every time an activity is saved.
-			userData.profile = profile;
 			return Friend.find({ $or: [{ sender_Id: user_Id }, { recipient_Id: user_Id }] }).exec()
 			//in the future, probably need to get all the friend and follow user_Info just to display
 		})
@@ -81,7 +68,7 @@ exports.userProfile = function(req, res) {
 }
 
 exports.uploadAvatar = function(req, res) {
-	Profile.update({ 'user_Id' : req.user._id }, { 'avatarUrl' : req.body.avatarUrl }, function(err, result) {
+	User.update({ '_id' : req.user._id }, { 'avatarUrl' : req.body.avatarUrl }, function(err, result) {
 		if (err) {
 			res.status(400).json({ message: "Error occured updating profile"});
 		} else {
@@ -92,7 +79,7 @@ exports.uploadAvatar = function(req, res) {
 }
 
 exports.uploadContact = function(req, res) {
-	Profile.update({ 'user_Id' : req.user._id }, { 'contact' : req.body.contact }, function(err, result) {
+	User.update({ '_id' : req.user._id }, { 'contact' : req.body.contact }, function(err, result) {
 		if (err) {
 			res.status(400).json({ message: "Error occured updating profile"});
 		} else {
@@ -103,7 +90,7 @@ exports.uploadContact = function(req, res) {
 }
 
 exports.uploadSummary = function(req, res) {
-	Profile.update({ 'user_Id' : req.user._id }, { 'summary' : req.body.summary }, function(err, result) {
+	User.update({ '_id' : req.user._id }, { 'summary' : req.body.summary }, function(err, result) {
 		if (err) {
 			res.status(400).json({ message: "Error occured updating profile"});
 		} else {
@@ -111,4 +98,15 @@ exports.uploadSummary = function(req, res) {
 			res.status(200).json({ message: "Profile updated"});
 		}
 	});	
+}
+
+exports.newActiveActivity = function(req, res) {
+	let activityName = req.body.activityName;
+	User.update({'_id': req.user._id }, { $addToSet: { 'activeActivities': activityName } }), function(err, result) {
+		if (err) {
+			res.status(400).json({message: "Error occured update activteActivities for user"});
+		} else {
+			res.status(200).json({message: "activeActivity update success"});
+		}
+	}
 }

@@ -10,7 +10,6 @@ var Friend = require('./../models/FriendSchema.js');
 var Witness = require('./../models/WitnessSchema.js');
 var User = require('./User.js');
 var UserModel = require('./../models/UserSchema.js');
-var Profile = require('./../models/ProfileSchema.js');
 
 exports.getRequests = function(req, res) {
 	let user_Id = req.user._id;
@@ -37,28 +36,17 @@ exports.getRequests = function(req, res) {
 			});
 			req.requestUsers = requestUsers;
 			console.log("users: " +users);
-			return Profile.find({"user_Id": {$in: user_Ids}}).exec()
-		})
-		.then(function(profiles){
-			req.requestUsers.forEach(function(requestUser){
-				//get the id of each user, then add all of the relevant data to the user object
-				let _id = requestUser.userInfo._id;
-				profiles.forEach(function(profile){
-					if (_id == profile.user_Id) {
-						requestUser.profile = profile;
-					}
-				});
-				console.log("UNCONFIRMED FRIENDS: " + req.unconfirmedFriends);
-				req.unconfirmedFriends.forEach(function(friendship){
-					if (_id == friendship.sender_Id) {
-						requestUser.unconfirmedFriendship = friendship;
-					}
-				});
-				req.unconfirmedWitnesses.forEach(function(witness){
-					if (_id == witness.witnessId) {
-						requestUser.unconfirmedWitness = witness;
-					}
-				});
+			let _id = requestUser.userInfo._id;
+			console.log("UNCONFIRMED FRIENDS: " + req.unconfirmedFriends);
+			req.unconfirmedFriends.forEach(function(friendship){
+				if (_id == friendship.sender_Id) {
+					requestUser.unconfirmedFriendship = friendship;
+				}
+			});
+			req.unconfirmedWitnesses.forEach(function(witness){
+				if (_id == witness.witnessId) {
+					requestUser.unconfirmedWitness = witness;
+				}
 			});
 			res.status(200).json({requestUsers: req.requestUsers});
 		})

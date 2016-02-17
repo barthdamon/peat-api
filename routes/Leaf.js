@@ -22,12 +22,12 @@ exports.newLeaf = function(req, res) {
 			Ability.findOne({name: abilityName, activity: activityName}).exec()
 		})
 		.then(function(ability){
-			let ability_Id = ability._id;
+			req.ability_Id = ability._id;
 
 			var newLeaf = new Leaf({
 				user_Id: req.user._id,
 				activityName: req.body.activityName,
-				ability_Id: ability_Id,
+				ability_Id: req.ability_Id,
 				leafId: req.body.leafId,
 				layout: {
 					coordinates: {
@@ -46,7 +46,7 @@ exports.newLeaf = function(req, res) {
 			return newLeaf.save()
 		})
 		.then(function(success){
-			res.status(201).json({message: "leaf created"});
+			res.status(201).json({message: "leaf created", "ability_Id": req.ability_Id});
 		})
 		.catch(function(err){
 			res.status(400).json({ message: "leaf create failure: " + err });
