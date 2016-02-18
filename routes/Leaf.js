@@ -22,28 +22,32 @@ exports.newLeaf = function(req, res) {
 			Ability.findOne({name: abilityName, activity: activityName}).exec()
 		})
 		.then(function(ability){
-			req.ability_Id = ability._id;
+			if (ability) {
+				req.ability_Id = ability._id;
 
-			var newLeaf = new Leaf({
-				user_Id: req.user._id,
-				activityName: req.body.activityName,
-				ability_Id: req.ability_Id,
-				leafId: req.body.leafId,
-				layout: {
-					coordinates: {
-						x: req.body.layout.coordinates.x,
-						y: req.body.layout.coordinates.y
+				var newLeaf = new Leaf({
+					user_Id: req.user._id,
+					activityName: req.body.activityName,
+					ability_Id: req.ability_Id,
+					leafId: req.body.leafId,
+					layout: {
+						coordinates: {
+							x: req.body.layout.coordinates.x,
+							y: req.body.layout.coordinates.y
+						},
+						groupingId: req.body.layout.grouping
 					},
-					groupingId: req.body.layout.grouping
-				},
-				completionStatus: req.body.completionStatus,
-				abilityName: req.body.abilityName,
-				description: req.body.description,
-				tip: req.body.tip,
-				timestamp: currentTime
-			});
+					completionStatus: req.body.completionStatus,
+					abilityName: req.body.abilityName,
+					description: req.body.description,
+					tip: req.body.tip,
+					timestamp: currentTime
+				});
 
-			return newLeaf.save()
+				return newLeaf.save()
+			} else {
+				throw "Ability not created"
+			}
 		})
 		.then(function(success){
 			res.status(201).json({message: "leaf created", "ability_Id": req.ability_Id});
@@ -54,22 +58,29 @@ exports.newLeaf = function(req, res) {
 	.done();
 }
 
-function abilityCheck(id, name, activity) {
+function abilityCheck(id, abilityName, activityName) {
+	console.log("ABILITY TITLE: " + abilityName);
+	console.log("ACTIVITY TITLE: " + activityName);
 	return new Promise(function(resolve, reject) {
-		if (ability_Id != "") {
+		//id already exists
+		if (id != "") {
 			resolve();
+		} else if (activityName == "" || abilityName == "") {
+			reject("Need activity and ability names to save leaf");
 		} else {
 			var newAbility = new Ability({
-				name: name,
-				activity: activity
+				name: abilityName,
+				activity: activityName
 			})
-			newAbility.save(function(err){
-				if(err) {
-					reject(err);
-				} else {
+			return newAbility.save()
+				.then(function(result){
+					console.log("Ability Created")
 					resolve();
-				}
-			});
+				})
+				.catch(function(err){
+					reject(err);
+				})
+			.done();
 		}
 	});
 }
