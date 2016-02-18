@@ -58,10 +58,6 @@ privateRouter.get('/friends/:id', Friend.getFriends);
 privateRouter.post('/follow/:id/:activity', Follow.newFollow);
 privateRouter.delete('/follow/:id', Follow.removeFollow);
 
-privateRouter.put('/users/profile/avatar', Profile.uploadAvatar);
-privateRouter.put('/users/profile/summary', Profile.uploadSummary);
-privateRouter.put('/users/profile/contact', Profile.uploadContact);
-
 privateRouter.get('/mail/requests', Mailbox.getRequests);
 
 privateRouter.post('/witness/new', Witness.createWitness);
@@ -71,9 +67,12 @@ privateRouter.delete('/witness/remove/:id', Witness.destroyWitness);
 privateRouter.get('/users/search/:term', User.searchUsers);
 privateRouter.get('/currentUser/profile', Profile.currentUserProfile);
 privateRouter.get('/user/profile/:id', Profile.userProfile);
+privateRouter.put('/profile/update', Profile.updateProfile);
+privateRouter.put('/user/update', User.updateUser);
 
 //News
-privateRouter.get('/news/:activityName/:abilityName', News.getLeafFeed);
+privateRouter.get('/news/leaf/:activityName/:abilityName', News.getLeafFeed);
+privateRouter.get('/news/:activityName', News.getNewsfeed);
 
 //Tree Related
 privateRouter.get('/activities/:activityTerm', Activity.searchActivities);

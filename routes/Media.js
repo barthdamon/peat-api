@@ -26,6 +26,7 @@ exports.postMedia = function(req, res) {
 		user_Id: req.user._id,
 		mediaId: mediaId,
 		leafId: leafId,
+		uploaderUser_Id: req.body.uploaderUser_Id,
 		ability_Id: ability_Id,
 		source: {
 			url: req.body.source.url,
@@ -61,6 +62,10 @@ exports.getMediaForLeaf = function(leafId) {
 				mediaInfo.media = media;
 				media.forEach(function(media){
 					mediaIds.push(media.mediaId);
+					user_Ids.push(media.uploaderUser_Id);
+					media.taggedUser_Ids.forEach(function(id){
+						user_Ids.push(id);
+					})
 				});
 				return Comment.find({$query: {mediaId: {$in: mediaIds}}, $orderby: { timestamp : -1 }}).exec()
 			})
@@ -106,11 +111,24 @@ exports.getMediaForLeaf = function(leafId) {
 			.then(function(userInfos){
 				userInfos.forEach(function(info){
 					mediaInfo.media.forEach(function(media){
+						if (media.uploaderUser_Id == info.userInfo._id) {
+							//the user who uploaded the media
+							media._doc.uploaderUserInfo = info;
+						}
+						media._doc.taggedUserInfos = [];
+						media.taggedUser_Ids.forEach(function(id){
+							if (id == info.userInfo._Id) {
+								//users that are tagged on the media
+								media._doc.taggedUserInfos.push(info);
+							}
+						})
+						//users on the comments
 						media._doc.comments.forEach(function(comment){
 							if (comment.sender_Id == info.userInfo._id) {
 								comment._doc.userInfo = info;
 							}
 						})
+						//users on the likes
 						media._doc.likes.forEach(function(like){
 							if (like.user_Id == info.userInfo._id) {
 								like._doc.userInfo = info;
@@ -144,6 +162,7 @@ exports.getMediaForLeafFeed = function(abilityId) {
 				mediaInfo.media = media;
 				media.forEach(function(media){
 					mediaIds.push(media.mediaId);
+					user_Ids.push(media.uploaderUser_Id);
 				});
 				return Comment.find({$query: {mediaId: {$in: mediaIds}}, $orderby: { timestamp : -1 }}).exec()
 			})
@@ -188,6 +207,17 @@ exports.getMediaForLeafFeed = function(abilityId) {
 			.then(function(userInfos){
 				userInfos.forEach(function(info){
 					mediaInfo.media.forEach(function(media){
+						if (media.uploaderUser_Id == info.userInfo._id) {
+							//the user who uploaded the media
+							media._doc.uploaderUserInfo = info;
+						}
+						media._doc.taggedUserInfos = [];
+						media.taggedUser_Ids.forEach(function(id){
+							if (id == info.userInfo._Id) {
+								//users that are tagged on the media
+								media._doc.taggedUserInfos.push(info);
+							}
+						})
 						media._doc.comments.forEach(function(comment){
 							if (comment.sender_Id == info.userInfo._id) {
 								comment._doc.userInfo = info;

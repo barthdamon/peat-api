@@ -139,6 +139,25 @@ exports.userProfilesForIds = function(ids) {
 	});
 }
 
+exports.updateUser = function(req, res) {
+	let info = req.body.userInfo;
+	User.update({'_id': req.user._id }, 
+		{ email: info.email, first: info.first, last: info.last, username: info.username, email: info.email, type: info.type}),
+	 	function(err, result) {
+		if (err) {
+			res.status(400).json({message: "Error occured update activteActivities for user"});
+		} else {
+			res.status(200).json({message: "activeActivity update success"});
+		}
+	}
+
+	       //  "first" : paramFor(first),
+        // "last" : paramFor(last),
+        // "username" : paramFor(username),
+        // "email" : paramFor(email),
+        // "type" : self.type.rawValue
+}
+
 // exports.userProfileForId = function(id) {
 // 	return new Promise(function(resolve, reject) {
 // 		var info = {};

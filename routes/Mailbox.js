@@ -34,21 +34,20 @@ exports.getRequests = function(req, res) {
 			users.forEach(function(user){
 				requestUsers.push({userInfo: User.userInfo(user)});
 			});
-			req.requestUsers = requestUsers;
-			console.log("users: " +users);
-			let _id = requestUser.userInfo._id;
-			console.log("UNCONFIRMED FRIENDS: " + req.unconfirmedFriends);
-			req.unconfirmedFriends.forEach(function(friendship){
-				if (_id == friendship.sender_Id) {
-					requestUser.unconfirmedFriendship = friendship;
-				}
-			});
-			req.unconfirmedWitnesses.forEach(function(witness){
-				if (_id == witness.witnessId) {
-					requestUser.unconfirmedWitness = witness;
-				}
-			});
-			res.status(200).json({requestUsers: req.requestUsers});
+			requestUsers.forEach(function(requestUser){
+				let _id = requestUser._id;
+				req.unconfirmedFriends.forEach(function(friendship){
+					if (_id == friendship.sender_Id) {
+						requestUser.unconfirmedFriendship = friendship;
+					}
+				});
+				req.unconfirmedWitnesses.forEach(function(witness){
+					if (_id == witness.witnessId) {
+						requestUser.unconfirmedWitness = witness;
+					}
+				});
+			})
+			res.status(200).json({requestUsers: requestUsers});
 		})
 		.catch(function(err){
 			res.status(400).json({message: "Error getting friends: " + err});

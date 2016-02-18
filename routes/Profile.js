@@ -67,42 +67,9 @@ exports.userProfile = function(req, res) {
 	.done();
 }
 
-exports.uploadAvatar = function(req, res) {
-	User.update({ '_id' : req.user._id }, { 'avatarUrl' : req.body.avatarUrl }, function(err, result) {
-		if (err) {
-			res.status(400).json({ message: "Error occured updating profile"});
-		} else {
-			console.log("profile update result: " + result);
-			res.status(200).json({ message: "Profile updated"});
-		}
-	});
-}
-
-exports.uploadContact = function(req, res) {
-	User.update({ '_id' : req.user._id }, { 'contact' : req.body.contact }, function(err, result) {
-		if (err) {
-			res.status(400).json({ message: "Error occured updating profile"});
-		} else {
-			console.log("profile update result: " + result);
-			res.status(200).json({ message: "Profile updated"});
-		}
-	});
-}
-
-exports.uploadSummary = function(req, res) {
-	User.update({ '_id' : req.user._id }, { 'summary' : req.body.summary }, function(err, result) {
-		if (err) {
-			res.status(400).json({ message: "Error occured updating profile"});
-		} else {
-			console.log("profile update result: " + result);
-			res.status(200).json({ message: "Profile updated"});
-		}
-	});	
-}
-
-exports.newActiveActivity = function(req, res) {
-	let activityName = req.body.activityName;
-	User.update({'_id': req.user._id }, { $addToSet: { 'activeActivities': activityName } }), function(err, result) {
+exports.updateProfile = function(req, res) {
+	let profile = req.body.profile;
+	User.update({'_id': req.user._id }, { profile: profile }), function(err, result) {
 		if (err) {
 			res.status(400).json({message: "Error occured update activteActivities for user"});
 		} else {
