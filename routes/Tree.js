@@ -47,7 +47,7 @@ exports.saveTree = function(req, res) {
 
 	let leafUpdates = req.body.updatedLeaves;
 	let leafRemovals = req.body.removedLeaves;
-	let newLeaves = req.body.newLeaves;
+	// let newLeaves = req.body.newLeaves;
 
 	let connectionUpdates = req.body.updatedConnections;
 	let connectionRemovals = req.body.removedConnections;
@@ -57,7 +57,7 @@ exports.saveTree = function(req, res) {
 	let groupingRemovals = req.body.removedGroupings;
 	let newGroupings = req.body.newGroupings;
 
-	console.log("NEW LEAVES: " + JSON.stringify(newLeaves) + "NEW CONNECTIONS:" + JSON.stringify(newConnections));
+	console.log("NEW CONNECTIONS:" + JSON.stringify(newConnections));
 
 	var leafUpd = function updateLeaf(leaf) {
 		leafUpdate(leaf, user_Id);
@@ -87,14 +87,14 @@ exports.saveTree = function(req, res) {
 						console.log("here2");
 			return Leaf.remove({leafId: {$in: removeLeafIds}}).exec()
 		})
-		.then(function(){
-						console.log("here3");
-			if (newLeaves.length > 0) {
-				return Leaf.collection.insert(newLeaves)
-			} else {
-				return
-			}
-		})
+		// .then(function(){
+		// 				console.log("here3");
+		// 	if (newLeaves.length > 0) {
+		// 		return Leaf.collection.insert(newLeaves)
+		// 	} else {
+		// 		return
+		// 	}
+		// })
 		.then(function(){
 			let action = connectionUpdates.map(connectionUpd);
 						console.log("here4");

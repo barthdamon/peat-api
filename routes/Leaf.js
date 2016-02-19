@@ -17,14 +17,17 @@ exports.newLeaf = function(req, res) {
 	let abilityName = req.body.abilityName;
 	let activityName = req.body.activityName;
 
-	abilityCheck(ability_Id, abilityName, activityName)
+	console.log("ABILITYNAME: " + abilityName + "ACTIVITYNAMES:" + activityName);
+	Ability.update({name: abilityName, activityName: activityName},
+		 {name: abilityName, activityName: activityName},
+		 {upsert: true}).exec()
 		.then(function(success){
-			Ability.findOne({name: abilityName, activity: activityName}).exec()
+			return Ability.findOne({name: abilityName, activityName: activityName}).exec()
 		})
 		.then(function(ability){
 			if (ability) {
 				req.ability_Id = ability._id;
-
+				console.log("ABILITY DONE");
 				var newLeaf = new Leaf({
 					user_Id: req.user._id,
 					activityName: req.body.activityName,
@@ -43,7 +46,6 @@ exports.newLeaf = function(req, res) {
 					tip: req.body.tip,
 					timestamp: currentTime
 				});
-
 				return newLeaf.save()
 			} else {
 				throw "Ability not created"
@@ -59,29 +61,9 @@ exports.newLeaf = function(req, res) {
 }
 
 function abilityCheck(id, abilityName, activityName) {
-	console.log("ABILITY TITLE: " + abilityName);
-	console.log("ACTIVITY TITLE: " + activityName);
 	return new Promise(function(resolve, reject) {
 		//id already exists
-		if (id != "") {
-			resolve();
-		} else if (activityName == "" || abilityName == "") {
-			reject("Need activity and ability names to save leaf");
-		} else {
-			var newAbility = new Ability({
-				name: abilityName,
-				activity: activityName
-			})
-			return newAbility.save()
-				.then(function(result){
-					console.log("Ability Created")
-					resolve();
-				})
-				.catch(function(err){
-					reject(err);
-				})
-			.done();
-		}
+
 	});
 }
 

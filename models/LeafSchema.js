@@ -9,6 +9,7 @@ var db = require('./../config/db.js');
 var leafSchema = mongoose.Schema({
 	user_Id: String,
 	activityName: String,
+	ability_Id: String,
 	leafId: String,
 	layout: {
 		coordinates: {
