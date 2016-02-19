@@ -20,7 +20,7 @@ exports.currentUserProfile = function(req, res) {
 	let needsMailbox = req.params.id != null ? false : true;
 	console.log("Generating User Profile For: " +user_Id);
 
-	User.findOne({"_id": user_Id}).exec()
+	User.findOne({_id: user_Id}).exec()
 		.then(function(user){
 			console.log(user);
 			userData.userInfo = UserRoute.userInfo(user);
@@ -46,7 +46,7 @@ exports.userProfile = function(req, res) {
 	let user_Id = req.params.id != null ? req.params.id : req.user._id;
 	console.log("Generating User Profile For: " +user_Id);
 
-	User.findOne({"_id": user_Id}).exec()
+	User.findOne({_id: user_Id}).exec()
 		.then(function(user){
 			console.log(user);
 			userData.userInfo = UserRoute.userInfo(user);
@@ -68,12 +68,15 @@ exports.userProfile = function(req, res) {
 }
 
 exports.updateProfile = function(req, res) {
+	console.log("Updating Profile with:" + JSON.stringify(req.body.profile));
 	let profile = req.body.profile;
-	User.update({'_id': req.user._id }, { profile: profile }), function(err, result) {
-		if (err) {
-			res.status(400).json({message: "Error occured update activteActivities for user"});
-		} else {
+	User.update({_id: req.user._id }, {profile: profile}).exec()
+		.then(function(result){
+			console.log("Profile update success");
 			res.status(200).json({message: "activeActivity update success"});
-		}
-	}
+		})
+		.catch(function(err){
+			res.status(400).json({message: "Error occured update activteActivities for user"});
+		})
+	.done();
 }

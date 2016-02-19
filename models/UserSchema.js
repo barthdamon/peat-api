@@ -34,7 +34,7 @@ var userSchema = mongoose.Schema({
 	joined: Number,
 	profile: {
 		summary: String,
-		avatarUrl: String,
+		avatarURL: String,
 		contact: String,
 		activeActivityNames: [String]
 	}
