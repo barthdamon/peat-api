@@ -47,7 +47,7 @@ exports.postMedia = function(req, res) {
 	});
 }
 
-exports.getMediaForLeaf = function(leafId) {
+exports.getMediaWithQuery = function(query) {
 	var mediaInfo = {};
 
 	var commentIds = [];
@@ -56,7 +56,7 @@ exports.getMediaForLeaf = function(leafId) {
 		
 	return new Promise(function(resolve, reject) {
 
-		Media.find({$query: {leafId: leafId}, $orderby: { timestamp : -1 }}).exec()
+		Media.find({$query: query, $orderby: { timestamp : -1 }}).limit(5).exec()
 			.then(function(media){
 				// console.log("MEDIA FOUND: " + JSON.stringify(media));
 				mediaInfo.media = media;
@@ -129,100 +129,6 @@ exports.getMediaForLeaf = function(leafId) {
 							}
 						})
 						//users on the likes
-						media._doc.likes.forEach(function(like){
-							if (like.user_Id == info.userInfo._id) {
-								like._doc.userInfo = info;
-							}
-						})
-					})
-				})
-				// console.log("MEDIA SENT: " + JSON.stringify(mediaInfo));
-				resolve(mediaInfo);
-			})
-			.catch(function(err){
-				reject(err);
-			})
-		.done();
-	});
-}
-
-
-
-exports.getMediaForLeafFeed = function(abilityId) {
-	var mediaInfo = {};
-	var commentIds = [];
-	var mediaIds = [];
-	var user_Ids = [];
-		
-	return new Promise(function(resolve, reject) {
-		//todo: come up with a better algorithm for getting what is suggested to people
-		Media.find({$query: {abilityId: abilityId, purpose: "Tutorial"}, $orderby: { timestamp : -1 }}).limit(5).exec()
-			.then(function(media){
-				// console.log("MEDIA FOUND: " + JSON.stringify(media));
-				mediaInfo.media = media;
-				media.forEach(function(media){
-					mediaIds.push(media.mediaId);
-					user_Ids.push(media.uploaderUser_Id);
-				});
-				return Comment.find({$query: {mediaId: {$in: mediaIds}}, $orderby: { timestamp : -1 }}).exec()
-			})
-			.then(function(comments){
-				comments.forEach(function(comment){
-					commentIds.push(comment._id);
-					mediaInfo.media.forEach(function(media){
-						if (comment.mediaId == media.mediaId) {
-							if (media._doc.comments) {
-								media._doc.comments.push(comment);
-							} else {
-								media._doc.comments = [comment];
-							}
-							// console.log("mediaCommentss: " + JSON.stringify(media._doc.comments));
-						}
-					})
-				});
-				return Like.find({$or: [{mediaId: {$in: mediaIds}}, {commentId: {$in: commentIds}}] }).exec()
-			})
-			.then(function(likes){
-				likes.forEach(function(like){
-					mediaInfo.media.forEach(function(media){
-						if (like.mediaId == media.mediaId) {
-							user_Ids.push(like.user_Id);
-							if (media._doc.likes) {
-								media._doc.likes.push(like);
-							} else {
-								media._doc.likes = [like];
-							}
-						}
-						media._doc.comments.forEach(function(comment){
-							if (like.comment_Id == comment._id) {
-								user_Ids.push(comment.sender_Id);
-								media.likes.push(like);
-							}
-						})
-					})
-				})
-				// console.log("likes: " + JSON.stringify(likes));
-				return User.userProfilesForIds(user_Ids)
-			})
-			.then(function(userInfos){
-				userInfos.forEach(function(info){
-					mediaInfo.media.forEach(function(media){
-						if (media.uploaderUser_Id == info.userInfo._id) {
-							//the user who uploaded the media
-							media._doc.uploaderUserInfo = info;
-						}
-						media._doc.taggedUserInfos = [];
-						media.taggedUser_Ids.forEach(function(id){
-							if (id == info.userInfo._Id) {
-								//users that are tagged on the media
-								media._doc.taggedUserInfos.push(info);
-							}
-						})
-						media._doc.comments.forEach(function(comment){
-							if (comment.sender_Id == info.userInfo._id) {
-								comment._doc.userInfo = info;
-							}
-						})
 						media._doc.likes.forEach(function(like){
 							if (like.user_Id == info.userInfo._id) {
 								like._doc.userInfo = info;

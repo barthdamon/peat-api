@@ -82,7 +82,7 @@ exports.getLeafData = function(req, res) {
 		.then(function(witnesses){
 			leafInfo.witnesses = witnesses;
 			console.log("Searching media with leafId: " +leafId + ", user_Id: " + user_Id);
-			return Media.getMediaForLeaf(leafId)
+			return Media.getMediaWithQuery({leafId: leafId})
 		})
 		.then(function(mediaInfo){
 			leafInfo.mediaInfo = mediaInfo;

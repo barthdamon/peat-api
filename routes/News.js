@@ -7,11 +7,40 @@ var Promise = require('bluebird');
 var Leaf = require('../models/LeafSchema.js');
 var Witness = require('./../models/WitnessSchema.js');
 var Ability = require('./../models/AbilitySchema.js');
+var Activity = require('./../models/ActivitySchema.js');
 var Media = require('./Media.js');
+var Following = require('./../models/FollowSchema.js');
 
 
 exports.getNewsfeed = function(req, res) {
+	let user_Id = req.user._id;
+	let activityName = req.params.activityName;
 
+	console.log("Generating Newsfeed");
+	Following.find({follower_Id: user_Id, following_Id: user_Id}).exec()
+		.then(function(following){
+			var user_Ids = [];
+			following.forEach(function(follow){
+				user_Ids.push(follow.follower_Id);
+				user_Ids.push(follow.following_Id);
+			});
+			//TODO: newsfeed algorithm................
+			var query = {};
+			if (activityName == "all") {
+				query = { uploaderUser_Id: { $in: user_Ids }, taggedUser_Ids: { $in: user_Ids } }
+			} else {
+				query = { activityName: activityName, uploaderUser_Id: { $in: user_Ids }, taggedUser_Ids: { $in: user_Ids } }
+			}
+			console.log("Following found");
+			return Media.getMediaWithQuery(query)
+		})
+		.then(function(mediaInfo){
+			res.status(200).json({"newsfeed": mediaInfo});
+		})
+		.catch(function(err){
+			res.status(400).json({"message": "Error getting newsfeed"});
+		})
+	.done();
 }
 
 exports.getLeafFeed = function(req, res) {
@@ -30,13 +59,14 @@ exports.getLeafFeed = function(req, res) {
 		.then(function(ability){
 			//todo: have a better algorithm that returns tutorials orgs pay for or whatever
 			//promisify all here
-			return Media.getMediaForLeafFeed(ability._id)
+			console.log("Looking for media with abilityName: " + abilityName + " activityName: " + activityName);
+			return Media.getMediaWithQuery({abilityName: abilityName, activityName: activityName})
 		})
 		.then(function(mediaInfo){
 			res.status(200).json({"leafFeed": mediaInfo});
 		})
 		.catch(function(err){
-			res.status(400).json({"message": "Error getting existing ability titles"});
+			res.status(400).json({"message": "Error getting leafFeed"});
 		})
 	.done();
 }
