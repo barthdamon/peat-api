@@ -55,8 +55,9 @@ privateRouter.put('/friends/remove/:id', Friend.destroyFriendship);
 privateRouter.put('/friends/reinitialize/:id', Friend.reinitializeFriend);
 privateRouter.get('/friends/:id', Friend.getFriends);
 
-privateRouter.post('/follow/:id/:activity', Follow.newFollow);
+privateRouter.post('/follow/new', Follow.newFollow);
 privateRouter.delete('/follow/:id', Follow.removeFollow);
+privateRouter.get('/follow/:id', Follow.getFollowing);
 
 privateRouter.get('/mail/requests', Mailbox.getRequests);
 

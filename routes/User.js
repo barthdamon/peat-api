@@ -113,7 +113,7 @@ exports.searchUsers = function(req, res) {
 			userModels.forEach(function(user){
 				userInfos.push({userInfo: userInfo(user)});
 			});
-	 		res.status(200).json({ users: req.userInfos});
+	 		res.status(200).json({ users: userInfos});
 		})
 		.catch(function(err){
 			console.log(err);
@@ -133,6 +133,7 @@ exports.userProfilesForIds = function(ids) {
 	 		resolve(userInfos);
 		})
 		.catch(function(err){
+			console.log("ERROR GETTING USER PROFILES: " + err);
 	 		reject(err);
 		})
 	.done();
@@ -157,25 +158,3 @@ exports.updateUser = function(req, res) {
         // "email" : paramFor(email),
         // "type" : self.type.rawValue
 }
-
-// exports.userProfileForId = function(id) {
-// 	return new Promise(function(resolve, reject) {
-// 		var info = {};
-
-// 		User.findOne({_id: id}).exec()
-// 			.then(function(user){
-// 				console.log("USER FOUND: ::" + user);
-// 				info = userInfo(user);
-// 				var user_Id = user._id;
-// 				return Profile.findOne({"user_Id": user_Id}).exec()
-// 			})
-// 			.then(function(profile){
-// 				info.profile = profile
-// 		 		resolve(info);
-// 			})
-// 			.catch(function(err){
-// 				reject(err);
-// 			})
-// 		.done();
-// 	});
-// }

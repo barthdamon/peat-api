@@ -15,7 +15,7 @@ var db = require('../config/db.js');
 var followSchema = mongoose.Schema({
 	follower_Id: String,
 	following_Id: String,
-	followingActivity: String,
+	followingActivities: [String],
 	timestamp: Number
 });
 

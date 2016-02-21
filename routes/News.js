@@ -10,32 +10,39 @@ var Ability = require('./../models/AbilitySchema.js');
 var Activity = require('./../models/ActivitySchema.js');
 var Media = require('./Media.js');
 var Following = require('./../models/FollowSchema.js');
+var User = require('./User.js');
 
 
 exports.getNewsfeed = function(req, res) {
 	let user_Id = req.user._id;
 	let activityName = req.params.activityName;
 
+	var user_Ids = [];
+
 	console.log("Generating Newsfeed");
-	Following.find({follower_Id: user_Id, following_Id: user_Id}).exec()
+	Following.find({follower_Id: user_Id}).exec()
 		.then(function(following){
-			var user_Ids = [];
 			following.forEach(function(follow){
-				user_Ids.push(follow.follower_Id);
 				user_Ids.push(follow.following_Id);
 			});
+			console.log("Followers found for newsfeed: " + JSON.stringify(user_Ids));
+			return User.userProfilesForIds(user_Ids)
+		})
+		.then(function(users){
+			req.following = users;
 			//TODO: newsfeed algorithm................
 			var query = {};
 			if (activityName == "all") {
-				query = { uploaderUser_Id: { $in: user_Ids }, taggedUser_Ids: { $in: user_Ids } }
+				query = { $or: [{uploaderUser_Id: { $in: user_Ids }}, {taggedUser_Ids: { $in: user_Ids }}] };
 			} else {
-				query = { activityName: activityName, uploaderUser_Id: { $in: user_Ids }, taggedUser_Ids: { $in: user_Ids } }
+				query = { activityName: activityName, $or: [{uploaderUser_Id: { $in: user_Ids }}, {taggedUser_Ids: { $in: user_Ids }}] };
 			}
 			console.log("Following found");
 			return Media.getMediaWithQuery(query)
 		})
 		.then(function(mediaInfo){
-			res.status(200).json({"newsfeed": mediaInfo});
+			console.log("MEDIA INFO: " + JSON.stringify(mediaInfo));
+			res.status(200).json({"newsfeed": mediaInfo, "following": req.following});
 		})
 		.catch(function(err){
 			res.status(400).json({"message": "Error getting newsfeed"});

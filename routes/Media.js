@@ -16,6 +16,7 @@ exports.postMedia = function(req, res) {
 	let leafId = req.body.leafId;
 	let mediaId = req.body.mediaId;
 	let ability_Id = req.body.ability_Id;
+	let taggedUser_Ids = req.body.taggedUser_Ids;
 
 	//For each variationId on the medias variations array check if there is a variation with the variationId. If not, create it with a custom field of true.
 	//Then post the media with the variations array of the request, assuming the variations on the request are all created or valid (are found)
@@ -23,10 +24,10 @@ exports.postMedia = function(req, res) {
 	//in the future may want audio files, they shouldnt be able to just stick a link in. Media would get lost that way... unreliable and unprofessional
 	//all leaves store references to the leafIds, which get pulled in later
 	var postedMedia = new Media({
-		user_Id: req.user._id,
 		mediaId: mediaId,
 		leafId: leafId,
-		uploaderUser_Id: req.body.uploaderUser_Id,
+		uploaderUser_Id: req.user._id,
+		taggedUser_Ids: taggedUser_Ids,
 		ability_Id: ability_Id,
 		source: {
 			url: req.body.source.url,
@@ -58,7 +59,7 @@ exports.getMediaWithQuery = function(query) {
 
 		Media.find({$query: query, $orderby: { timestamp : -1 }}).limit(5).exec()
 			.then(function(media){
-				// console.log("MEDIA FOUND: " + JSON.stringify(media));
+				console.log("MEDIA FOUND: " + JSON.stringify(media));
 				mediaInfo.media = media;
 				media.forEach(function(media){
 					mediaIds.push(media.mediaId);
@@ -70,7 +71,6 @@ exports.getMediaWithQuery = function(query) {
 				return Comment.find({$query: {mediaId: {$in: mediaIds}}, $orderby: { timestamp : -1 }}).exec()
 			})
 			.then(function(comments){
-				console.log("DECORATED COMMENTS: " + comments);
 				comments.forEach(function(comment){
 					commentIds.push(comment._id);
 					mediaInfo.media.forEach(function(media){
@@ -80,7 +80,7 @@ exports.getMediaWithQuery = function(query) {
 							} else {
 								media._doc.comments = [comment];
 							}
-							// console.log("mediaCommentss: " + JSON.stringify(media._doc.comments));
+							console.log("mediaCommentss: " + JSON.stringify(media._doc.comments));
 						}
 					})
 				});
@@ -105,7 +105,8 @@ exports.getMediaWithQuery = function(query) {
 						})
 					})
 				})
-				// console.log("likes: " + JSON.stringify(likes));
+				console.log("likes: " + JSON.stringify(likes));
+				console.log("user_Ids: " + JSON.stringify(user_Ids));
 				return User.userProfilesForIds(user_Ids)
 			})
 			.then(function(userInfos){
@@ -117,29 +118,34 @@ exports.getMediaWithQuery = function(query) {
 						}
 						media._doc.taggedUserInfos = [];
 						media.taggedUser_Ids.forEach(function(id){
-							if (id == info.userInfo._Id) {
+							if (id == info.userInfo._id) {
 								//users that are tagged on the media
 								media._doc.taggedUserInfos.push(info);
 							}
 						})
 						//users on the comments
-						media._doc.comments.forEach(function(comment){
-							if (comment.sender_Id == info.userInfo._id) {
-								comment._doc.userInfo = info;
-							}
-						})
+						if (media._doc.comments) {
+							media._doc.comments.forEach(function(comment){
+								if (comment.sender_Id == info.userInfo._id) {
+									comment._doc.userInfo = info;
+								}
+							})
+						}
 						//users on the likes
-						media._doc.likes.forEach(function(like){
-							if (like.user_Id == info.userInfo._id) {
-								like._doc.userInfo = info;
-							}
-						})
+						if (media._doc.likes) {
+							media._doc.likes.forEach(function(like){
+								if (like.user_Id == info.userInfo._id) {
+									like._doc.userInfo = info;
+								}
+							})
+						}
 					})
 				})
-				// console.log("MEDIA SENT: " + JSON.stringify(mediaInfo));
+				console.log("MEDIA SENT: " + JSON.stringify(mediaInfo));
 				resolve(mediaInfo);
 			})
 			.catch(function(err){
+				console.log("ERROR GETTING MEDIA: " + err);
 				reject(err);
 			})
 		.done();

@@ -11,14 +11,14 @@ var User = require('./User.js');
 
 exports.newFollow = function(req, res) {
 	let follower = req.user._id;
-	let following = req.params.id;
-	let followingActivity = req.params.activity;
+	let following = req.body.following_Id;
+	//TODO
+	// let followingActivities = req.body.followingActivities;
 	let currentTime = Date.now();
 
 	let newFollow = new Follow({
-		follower_Id: sender,
-		following_Id: recipient,
-		followingActivity: followingActivity,
+		follower_Id: follower,
+		following_Id: following,
 		timestamp: currentTime
 	});
 
@@ -47,5 +47,27 @@ exports.removeFollow = function(req, res) {
 			res.status(200).json({ message: "Follow removed"});
 		}		
 	});
+}
+
+exports.getFollowing = function(req, res) {
+	var user_Ids = [];
+	let user_Id = req.params.id;
+	console.log("Id: "+ user_Id);
+	//This is where the user asks for all their friends
+	Follow.find({ follower_Id: user_Id }).exec()
+		.then(function(follow){
+			console.log("follows: " + follow);
+			follow.forEach(function(follow){
+				user_Ids.push(follow.following_Id);
+			});
+			return User.userProfilesForIds(user_Ids)
+		})
+		.then(function(users){
+			res.status(200).json({following: users});
+		})
+		.catch(function(err){
+			res.status(400).json({message: "Error getting following: " + err});
+		})
+	.done();
 }
 
