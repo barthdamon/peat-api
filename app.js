@@ -30,6 +30,7 @@ var Mailbox = require('./routes/Mailbox.js');
 var Witness = require('./routes/Witness.js');
 var Comment = require('./routes/Comment.js');
 var News = require('./routes/News.js');
+var Gallery = require('./routes/Gallery.js');
 
 //MARK: ROUTES
 //Public Routes
@@ -60,6 +61,8 @@ privateRouter.delete('/follow/:id', Follow.removeFollow);
 privateRouter.get('/follow/:id', Follow.getFollowing);
 
 privateRouter.get('/mail/requests', Mailbox.getRequests);
+privateRouter.get('/gallery/:id', Gallery.getGallery);
+
 
 privateRouter.post('/witness/new', Witness.createWitness);
 privateRouter.delete('/witness/remove/:id', Witness.destroyWitness);
@@ -74,12 +77,13 @@ privateRouter.put('/user/update', User.updateUser);
 //News
 privateRouter.get('/news/leaf/:activityName/:abilityName', News.getLeafFeed);
 privateRouter.get('/news/:activityName', News.getNewsfeed);
-
 //Tree Related
 privateRouter.get('/activities/:activityTerm', Activity.searchActivities);
 privateRouter.get('/abilities/:activityName/:abilityTerm', Leaf.findExistingAbility);
 
 privateRouter.post('/media', Media.postMedia);
+privateRouter.put('/gallery/media', Gallery.mediaToGallery);
+privateRouter.put('/gallery/activities', Gallery.activityToGallery);
 privateRouter.post('/media/comment/new', Comment.createComment);
 privateRouter.post('/media/like/new', Comment.newLike);
 

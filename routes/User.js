@@ -8,6 +8,7 @@ var Promise = require('bluebird');
 var jwt = require('jwt-simple');
 
 var User = require('../models/UserSchema.js');
+var Gallery = require('../models/GallerySchema.js');
 
 //MARK: Internal
 exports.userInfo =  userInfo;
@@ -55,7 +56,14 @@ exports.createUser = function(req, res) {
 			return User.findOne({email: email}).exec()
 		})
 		.then(function(user){
-			let token = generateToken(user._id);
+			user_Id = user._id;
+			let newGallery = new Gallery({
+				user_Id: user_Id
+			})
+			return Gallery.save()
+		})
+		.then(function(result){
+			let token = generateToken(user_Id);
 			res.status(200).json(token);
 		})
 		.catch(function(err){

@@ -8,43 +8,59 @@ var Media = require('../models/MediaSchema.js');
 var Comment = require('./../models/CommentSchema.js');
 var Like = require('./../models/LikeSchema.js');
 var User = require('./User.js');
+var Gallery = require('./Gallery.js');
 
 
 exports.postMedia = function(req, res) {
-	let currentTime = Date.now();
-	//Leaf structure MUST be the stableId of the leaf
-	let leafId = req.body.leafId;
-	let mediaId = req.body.mediaId;
-	let ability_Id = req.body.ability_Id;
-	let taggedUser_Ids = req.body.taggedUser_Ids;
-
-	//For each variationId on the medias variations array check if there is a variation with the variationId. If not, create it with a custom field of true.
-	//Then post the media with the variations array of the request, assuming the variations on the request are all created or valid (are found)
-
-	//in the future may want audio files, they shouldnt be able to just stick a link in. Media would get lost that way... unreliable and unprofessional
-	//all leaves store references to the leafIds, which get pulled in later
-	var postedMedia = new Media({
-		mediaId: mediaId,
-		leafId: leafId,
-		uploaderUser_Id: req.user._id,
-		taggedUser_Ids: taggedUser_Ids,
-		ability_Id: ability_Id,
-		source: {
-			url: req.body.source.url,
-			mediaType: req.body.source.mediaType
-		},
-		description: req.body.description,
-		purpose: req.body.purpose,
-		location: req.body.location,
-		timestamp: currentTime
-	});
-
-	postedMedia.save(function(err){
-		if (err){
-			res.status(400).json({ message: "media post failure: " + err });
-		} else {
+	createMedia(req)
+		.then(function(result){
 			res.status(201).json({message: "media posted"});			
-		}
+		})
+		.catch(function(err){
+			res.status(400).json({ message: "media post failure: " + err });
+		})
+	.done();
+}
+
+exports.createMedia = createMedia;
+function createMedia(req) {
+	return new Promise(function(resolve, reject) {
+		let currentTime = Date.now();
+		//Leaf structure MUST be the stableId of the leaf
+		let leafId = req.body.leafId;
+		let mediaId = req.body.mediaId;
+		let ability_Id = req.body.ability_Id;
+		let taggedUser_Ids = req.body.taggedUser_Ids;
+
+		//For each variationId on the medias variations array check if there is a variation with the variationId. If not, create it with a custom field of true.
+		//Then post the media with the variations array of the request, assuming the variations on the request are all created or valid (are found)
+
+		//in the future may want audio files, they shouldnt be able to just stick a link in. Media would get lost that way... unreliable and unprofessional
+		//all leaves store references to the leafIds, which get pulled in later
+		var postedMedia = new Media({
+			mediaId: mediaId,
+			leafId: leafId,
+			uploaderUser_Id: req.user._id,
+			taggedUser_Ids: taggedUser_Ids,
+			ability_Id: ability_Id,
+			source: {
+				url: req.body.source.url,
+				mediaType: req.body.source.mediaType
+			},
+			description: req.body.description,
+			purpose: req.body.purpose,
+			location: req.body.location,
+			timestamp: currentTime
+		});
+
+		postedMedia.save()
+			.then(function(result){
+				resolve();		
+			})
+			.catch(function(err){
+				reject(err);
+			})
+		.done();
 	});
 }
 
