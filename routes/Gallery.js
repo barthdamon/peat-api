@@ -24,7 +24,7 @@ function addMediaToGallery(req) {
 	return new Promise(function(resolve, reject) {
 		MediaRoute.createMedia(req)
 			.then(function(result){
-				return Gallery.update({user_Id: req.user._id, "activityTags.activityName": req.body.activityName}, 
+				return Gallery.update({user_Id: req.user._id}, 
 					{$addToSet: {mediaIds: req.body.mediaId}}).exec()
 			})
 			.then(function(result){
@@ -44,10 +44,8 @@ exports.getGallery = function(req, res) {
 		.then(function(gallery){
 			req.gallery = gallery;
 			var mediaIds = [];
-			gallery.activityTags.forEach(function(activity){
-				activity.mediaIds.forEach(function(id){
-					mediaIds.push(id);
-				})
+			activity.mediaIds.forEach(function(id){
+				mediaIds.push(id);
 			})
 			return MediaRoute.getMediaWithQuery({mediaId: {$in: mediaIds}})
 		})
@@ -57,6 +55,7 @@ exports.getGallery = function(req, res) {
 		.catch(function(err){
 			res.status(400).json({messiage: "Error getting gallery: " + err});
 		})
+	.done();
 }
 
 exports.activityToGallery = function(req, res) {

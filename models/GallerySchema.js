@@ -14,10 +14,7 @@ var db = require('./../config/db.js');
 
 var gallerySchema = mongoose.Schema({
 	user_Id: String,
-	activityTags: [{
-		activityName: String,
-		mediaIds: [String]
-	}]
+	mediaIds: [String]
 });
 
 mongoose.model('Gallery', gallerySchema);

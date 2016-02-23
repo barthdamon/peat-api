@@ -65,12 +65,15 @@ exports.getLeafFeed = function(req, res) {
 		})
 		.then(function(ability){
 			//todo: have a better algorithm that returns tutorials orgs pay for or whatever
-			//promisify all here
 			console.log("Looking for media with abilityName: " + abilityName + " activityName: " + activityName);
-			return Media.getMediaWithQuery({abilityName: abilityName, activityName: activityName})
+			return Media.getMediaWithQuery({abilityName: abilityName, activityName: activityName, purpose: "Tutorial"})
 		})
-		.then(function(mediaInfo){
-			res.status(200).json({"leafFeed": mediaInfo});
+		.then(function(tutorialMediaInfo){
+			req.tutorialMediaInfo = tutorialMediaInfo;
+			return Media.getMediaWithQuery({abilityName: abilityName, activityName: activityName, purpose: "Attempt"})
+		})
+		.then(function(leafFeedMediaInfo){
+			res.status(200).json({"leafFeed": leafFeedMediaInfo, "leafTutorials": req.tutorialMediaInfo});
 		})
 		.catch(function(err){
 			res.status(400).json({"message": "Error getting leafFeed"});
