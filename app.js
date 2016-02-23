@@ -63,7 +63,6 @@ privateRouter.get('/follow/:id', Follow.getFollowing);
 privateRouter.get('/mail/requests', Mailbox.getRequests);
 privateRouter.get('/gallery/:id', Gallery.getGallery);
 
-
 privateRouter.post('/witness/new', Witness.createWitness);
 privateRouter.delete('/witness/remove/:id', Witness.destroyWitness);
 
@@ -81,9 +80,9 @@ privateRouter.get('/news/:activityName', News.getNewsfeed);
 privateRouter.get('/activities/:activityTerm', Activity.searchActivities);
 privateRouter.get('/abilities/:activityName/:abilityTerm', Leaf.findExistingAbility);
 
+//Media
 privateRouter.post('/media', Media.postMedia);
-privateRouter.put('/gallery/media', Gallery.mediaToGallery);
-privateRouter.put('/gallery/activities', Gallery.activityToGallery);
+privateRouter.post('/gallery/media', Gallery.mediaToGallery);
 privateRouter.post('/media/comment/new', Comment.createComment);
 privateRouter.post('/media/like/new', Comment.newLike);
 

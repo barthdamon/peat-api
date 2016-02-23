@@ -55,6 +55,7 @@ function createMedia(req) {
 
 		postedMedia.save()
 			.then(function(result){
+				console.log("Media Created");
 				resolve();		
 			})
 			.catch(function(err){
@@ -62,6 +63,10 @@ function createMedia(req) {
 			})
 		.done();
 	});
+}
+
+exports.deleteMedia = function(req, res) {
+
 }
 
 exports.getMediaWithQuery = function(query) {

@@ -60,7 +60,7 @@ exports.createUser = function(req, res) {
 			let newGallery = new Gallery({
 				user_Id: user_Id
 			})
-			return Gallery.save()
+			return newGallery.save()
 		})
 		.then(function(result){
 			let token = generateToken(user_Id);
