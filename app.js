@@ -60,7 +60,9 @@ privateRouter.post('/follow/new', Follow.newFollow);
 privateRouter.delete('/follow/:id', Follow.removeFollow);
 privateRouter.get('/follow/:id', Follow.getFollowing);
 
-privateRouter.get('/mail/requests', Mailbox.getRequests);
+privateRouter.get('/mail/notifications', Mailbox.getNotifications);
+privateRouter.put('/mail/notifications', Mailbox.markNotificationsSeen);
+
 privateRouter.get('/gallery/:id', Gallery.getGallery);
 
 privateRouter.post('/witness/new', Witness.createWitness);
