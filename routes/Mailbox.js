@@ -58,48 +58,60 @@ module.exports = {
 //should be mapping the objects to attach whatever they need attached to them #es6Bitch
 	getNotifications: (req, res) => {
 		// if a notification has a certain mediaId on it then ask for that piece of media again from the store
-		Notification.find({ userToNotify_Id : req.user._id, $orderby: { timestamp : -1 }}).limit(10).exec()
+		Notification.find({ $query: {userToNotify_Id : req.user._id}, $orderby: { timestamp : -1 }}).limit(10).exec()
 			.then(notifications => {
 				req.notifications = notifications;
 				var mediaIds = [];
-				notifications.forEach(notification => {
-					if (notification.mediaId) {
-						mediaIds.append(notification.mediaId);
-					}
-				});
-				return Media.getMediaWithQuery({mediaId: {$in: mediaIds}})
+				if (notifications) {
+					notifications.forEach(notification => {
+						if (notification.mediaId) {
+							mediaIds.append(notification.mediaId);
+						}
+					});	
+					return Media.getMediaWithQuery({mediaId: {$in: mediaIds}})				
+				} else {
+					return Promise.resolve(null);
+				}
 			})
 			.then(mediaObjects => {
 				var userIds = [];
-				req.notifications.forEach(notification => {
-					//attach the mediaObjects
-					mediaObjects.forEach(object => {
-						if (object.mediaId = notification.mediaId) {
-							notification._doc.mediaObject = object;
-						}
-					})
-					//get userId
-					userIds.append(notification.userNotifying_Id);
-				});
-				return User.userProfilesForIds(userIds)
+				if (mediaObjects) {
+					req.notifications.forEach(notification => {
+						//attach the mediaObjects
+						mediaObjects.forEach(object => {
+							if (object.mediaId = notification.mediaId) {
+								notification._doc.mediaObject = object;
+							}
+						})
+						//get userId
+						userIds.append(notification.userNotifying_Id);
+					});		
+					return User.userProfilesForIds(userIds)			
+				} else {
+					return Promise.resolve(null);
+				}
 			})
 			.then(users => {
-				let notifications = req.notifications;
-				notifications.forEach(notification => {
-					users.forEach(user => {
-						if (notification.userNotifying_Id == user._id) {
-							notification._doc.userNotifying = user;
-						}
-					})
-				});
+				let notifications = req.notifications != null ? req.notifications : [] ;
+				if (users && notifications.count > 0) {
+					notifications.forEach(notification => {
+						users.forEach(user => {
+							if (notification.userNotifying_Id == user._id) {
+								notification._doc.userNotifying = user;
+							}
+						})
+					});					
+				}
 				res.status(200).json({ notifications: notifications });
 			})
 			.catch(err => {
-				res.status(400).json({ message: "Error fetching notifications"});
+				console.log("Error fetching notifications: " + err);
+				res.status(400).json({ message: "Error fetching notifications: " + err});
 			})
 		.done();
 	}
-}
+	
+} //END EXPORTS
 
 
 
