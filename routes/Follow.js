@@ -8,6 +8,7 @@ var Promise = require('bluebird');
 
 var Follow = require('./../models/FollowSchema.js');
 var User = require('./User.js');
+var Mailbox = require('./Mailbox.js');
 
 exports.newFollow = function(req, res) {
 	let follower = req.user._id;
@@ -22,13 +23,18 @@ exports.newFollow = function(req, res) {
 		timestamp: currentTime
 	});
 
-	newFollow.save(function(err) {
-		if (err) {
-			res.status(400).json({ message: "follow create failure: " + err });
-		} else {
-			res.status(200).json({ message: "follow create success" });
-		}
-	});
+	newFollow.save()
+		.then(follow => {
+			return Mailbox.createNotification(following, follower, "follow", null)
+		})
+		.then(notification => {
+			res.status(200).json({message: "Follow created Successfully"});
+		})
+		.catch(err => {
+			console.log(`Error creating follow ${err}`);
+			res.status(400).json({message: "Follow creation failure " + err});
+		})
+	.done();
 }
 
 //d

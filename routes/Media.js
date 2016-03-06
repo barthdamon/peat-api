@@ -121,7 +121,7 @@ exports.getMediaWithQuery = function(query) {
 		
 	return new Promise(function(resolve, reject) {
 
-		Media.find({$query: query, $orderby: { timestamp : -1 }}).limit(5).exec()
+		Media.find(query).sort( { timestamp: -1 } ).limit(5).exec()
 			.then(function(media){
 				console.log("MEDIA FOUND: " + JSON.stringify(media));
 				mediaInfo.media = media;
