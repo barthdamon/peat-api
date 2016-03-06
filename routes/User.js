@@ -15,8 +15,7 @@ exports.userInfo =  userInfo;
 function userInfo(user) {
 	return {
 		_id: user._id,
-		first: user.first,
-		last: user.last,
+		name: user.name,
 		username: user.username,
 		email: user.email,
 		type: user.type,
@@ -28,8 +27,7 @@ function userInfo(user) {
 //MARK: External
 //New
 exports.createUser = function(req, res) {
-	let first = req.body.first;
-	let last = req.body.last;
+	let name = req.body.name;
 	let username = req.body.username;
 	let email = req.body.email;
 	let password = req.body.password;
@@ -37,8 +35,7 @@ exports.createUser = function(req, res) {
 	let currentTime = Date.now();
 
 	let newUser = new User({
-		first: first,
-		last: last,
+		name: name,
 		username: username,
 		email: email, 
 		password: password,
@@ -115,7 +112,7 @@ exports.searchUsers = function(req, res) {
 	console.log("User Search Term: " +searchTerm);
 	var user_Ids = [];
 
-	User.find({$or : [ {username: {$regex : searchTerm, $options: 'i'}}, {first: {$regex: searchTerm, $options: 'i'}}, {last: {$regex: searchTerm, $options: 'i'}}] }).exec()
+	User.find({$or : [ {username: {$regex : searchTerm, $options: 'i'}}, {name: {$regex: searchTerm, $options: 'i'}}] }).exec()
 		.then(function(userModels){
 			var userInfos = [];
 			userModels.forEach(function(user){
@@ -149,20 +146,14 @@ exports.userProfilesForIds = function(ids) {
 }
 
 exports.updateUser = function(req, res) {
-	let info = req.body.userInfo;
-	User.update({'_id': req.user._id }, 
-		{ email: info.email, first: info.first, last: info.last, username: info.username, email: info.email, type: info.type}),
-	 	function(err, result) {
-		if (err) {
-			res.status(400).json({message: "Error occured update activteActivities for user"});
-		} else {
-			res.status(200).json({message: "activeActivity update success"});
-		}
-	}
-
-	       //  "first" : paramFor(first),
-        // "last" : paramFor(last),
-        // "username" : paramFor(username),
-        // "email" : paramFor(email),
-        // "type" : self.type.rawValue
+	let user = req.body.user;
+	User.update({_id: req.user._id }, user).exec()
+		.then(function(result){
+			console.log("user update success");
+			res.status(200).json({message: "user update success"});
+		})
+		.catch(function(err){
+			res.status(400).json({message: "Error occured updating user"});
+		})
+	.done();
 }

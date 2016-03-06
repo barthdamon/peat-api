@@ -70,7 +70,6 @@ privateRouter.delete('/witness/remove/:id', Witness.destroyWitness);
 privateRouter.get('/users/search/:term', User.searchUsers);
 privateRouter.get('/currentUser/profile', Profile.currentUserProfile);
 privateRouter.get('/user/profile/:id', Profile.userProfile);
-privateRouter.put('/profile/update', Profile.updateProfile);
 privateRouter.put('/user/update', User.updateUser);
 
 //News
@@ -82,6 +81,7 @@ privateRouter.get('/abilities/:activityName/:abilityTerm', Leaf.findExistingAbil
 
 //Media
 privateRouter.post('/media', Media.postMedia);
+privateRouter.put('/media/update', Media.updateMedia);
 privateRouter.post('/gallery/media', Gallery.mediaToGallery);
 privateRouter.post('/media/comment/new', Comment.createComment);
 privateRouter.post('/media/like/new', Comment.newLike);

@@ -9,6 +9,7 @@ var Comment = require('./../models/CommentSchema.js');
 var Like = require('./../models/LikeSchema.js');
 var User = require('./User.js');
 var Gallery = require('./Gallery.js');
+var GalleryModel = require('../models/GallerySchema.js');
 
 
 exports.postMedia = function(req, res) {
@@ -67,6 +68,48 @@ function createMedia(req) {
 
 exports.deleteMedia = function(req, res) {
 
+}
+
+exports.updateMedia = function(req, res) {
+	let mediaObject = req.body.media;
+	let mediaId = mediaObject.mediaId
+
+	var galleryUpd = function updateConnection(user_Id) {
+		updateUserGalleryWithMedia(mediaId, user_Id);
+	}
+
+	Media.update({ mediaId: mediaId }, mediaObject).exec()
+		.then(function(result){
+			console.log("Media Updated");
+			if (mediaObject.taggedUser_Ids) {
+				var action = mediaObject.taggedUser_Ids.map(galleryUpd);
+				return Promise.promisifyAll(action, {multiArgs: true})
+			} else {
+				return Promise.resolve();
+			}
+		})
+		.then(function(result){
+			res.status(200).status({message: "Media Updated"});
+		})
+		.catch(function(err){
+			res.status(400).json({message: "Error updating Media " + err});
+		})
+	.done();
+}
+
+function updateUserGalleryWithMedia(mediaId, user_Id) {
+	return new Promise(function(resolve, reject) {
+		GalleryModel.update({ user_Id : user_Id }, { $addToSet: {mediaIds: mediaId }}).exec()
+			.then(function(result){
+				console.log("Gallery updated");
+				resolve(result);
+			})
+			.catch(function(err){
+				console.log("Gallery Update Failure " + err);
+				reject(err);
+			})
+		.done();
+	});
 }
 
 exports.getMediaWithQuery = function(query) {

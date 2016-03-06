@@ -67,16 +67,16 @@ exports.userProfile = function(req, res) {
 	.done();
 }
 
-exports.updateProfile = function(req, res) {
-	console.log("Updating Profile with:" + JSON.stringify(req.body.profile));
-	let profile = req.body.profile;
-	User.update({_id: req.user._id }, {profile: profile}).exec()
-		.then(function(result){
-			console.log("Profile update success");
-			res.status(200).json({message: "activeActivity update success"});
-		})
-		.catch(function(err){
-			res.status(400).json({message: "Error occured update activteActivities for user"});
-		})
-	.done();
-}
+// exports.updateProfile = function(req, res) {
+// 	console.log("Updating Profile with:" + JSON.stringify(req.body.profile));
+// 	let profile = req.body.profile;
+// 	User.update({_id: req.user._id }, {profile: profile}).exec()
+// 		.then(function(result){
+// 			console.log("Profile update success");
+// 			res.status(200).json({message: "activeActivity update success"});
+// 		})
+// 		.catch(function(err){
+// 			res.status(400).json({message: "Error occured update activteActivities for user"});
+// 		})
+// 	.done();
+// }

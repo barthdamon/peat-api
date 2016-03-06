@@ -25,8 +25,7 @@ var SALT_WORK_FACTOR = 10;
 
 // in the future (after everything is working) need to integrate with facebook, twitter, and instagram
 var userSchema = mongoose.Schema({
-	first: String,
-	last: String,
+	name: String,
 	username: { type: String, unique: true},
 	email: { type: String, unique: true }, 
 	password: String,
