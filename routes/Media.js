@@ -144,7 +144,7 @@ exports.getMediaWithQuery = function(query) {
 							} else {
 								media._doc.comments = [comment];
 							}
-							console.log("mediaCommentss: " + JSON.stringify(media._doc.comments));
+							console.log("mediaComments: " + JSON.stringify(media._doc.comments));
 						}
 					})
 				});

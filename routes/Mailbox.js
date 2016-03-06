@@ -57,12 +57,8 @@ module.exports = {
 
 //should be mapping the objects to attach whatever they need attached to them #es6Bitch
 	getNotifications: (req, res) => {
-		// if a notification has a certain mediaId on it then ask for that piece of media again from the store
-		// Notification.find({userToNotify_Id: req.user._id}).limit(10).exec()
 		let id = req.user._id;
 		console.log(`Generating notifications for ${id}`);
-		// Notification.find({ userToNotify_Id: req.user._id }).limit(10).exec()
-		// Notification.find({ $query: { userToNotify_Id: req.user._id }, $orderby: { timestamp : -1 }}).limit(10).exec()
 		Notification.find({ userToNotify_Id: req.user._id }).sort( { timestamp: -1 } ).limit(10).exec()
 			.then(notifications => {
 				req.notifications = notifications;
@@ -92,15 +88,13 @@ module.exports = {
 			.then(users => {
 				console.log("Users for notifications found: " + JSON.stringify(users));
 				let notifications = req.notifications != null ? req.notifications : [] ;
-				if (users != null && notifications.count > 0) {
-					notifications.forEach(notification => {
-						users.forEach(user => {
-							if (notification.userNotifying_Id == user._id) {
-								notification._doc.userNotifying = user;
-							}
-						})
-					});					
-				}
+				notifications.forEach(notification => {
+					users.forEach(user => {
+						if (notification.userNotifying_Id == user.userInfo._id) {
+							notification._doc.userNotifying = user.userInfo;
+						}
+					})
+				});					
 				res.status(200).json({ notifications: notifications });
 			})
 			.catch(err => {
