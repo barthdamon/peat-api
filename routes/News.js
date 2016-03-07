@@ -25,6 +25,8 @@ exports.getNewsfeed = function(req, res) {
 			following.forEach(function(follow){
 				user_Ids.push(follow.following_Id);
 			});
+			// want users feed to have their stuff in there too...
+			user_Ids.push(user_Id);
 			console.log("Followers found for newsfeed: " + JSON.stringify(user_Ids));
 			return User.userProfilesForIds(user_Ids)
 		})

@@ -9,6 +9,7 @@ var Leaf = require('../models/LeafSchema.js');
 var Media = require('../models/MediaSchema.js');
 var Like = require('../models/LikeSchema.js');
 var Witness = require('../models/WitnessSchema.js');
+var Mailbox = require('./Mailbox.js');
 
 exports.createComment = function(req, res) {
 	console.log("HERE");
@@ -22,13 +23,34 @@ exports.createComment = function(req, res) {
 		timestamp: currentTime		
 	});
 
-	newComment.save(function(err) {
-		if (err) {
-			res.status(400).json({ message: "comment create failure: " + err });
-		} else {
+	var user_Ids = [];
+
+	newComment.save()
+		.then(comment => {
+			return Media.findOne({mediaId: req.body.mediaId }).exec()
+		})
+		.then(media=> {
+			media.taggedUserIds.forEach(id => {
+				user_Ids.push(id);
+			})
+			user_Ids.push(media.uploaderUser_Id);
+			return Comment.find({ mediaId: req.body.mediaId }).exec()
+		})
+		.then(comments => {
+			comments.forEach(comment => {
+				if (comment.sender != sender) {
+					user_Ids.push(comment.sender);
+				}
+			})
+			return Mailbox.createNotifications(user_Ids, sender, "comment", mediaId)
+		})
+		.then(result => {
 			res.status(200).json({ message: "comment create success" });
-		}
-	});
+		})
+		.catch(err => {
+			res.status(400).json({ message: "comment create failure: " + err });
+		})
+	.done();
 }
 
 //MARK: Like
@@ -44,12 +66,22 @@ exports.newLike = function(req, res) {
 		timestamp: currentTime
 	});
 
-	newLike.save(function(err) {
-		if (err) {
-			res.status(400).json({ message: "like create failure: " + err });
-		} else {
+	newLike.save()
+		.then(like => {
+			return Media.findOne({mediaId: req.body.mediaId }).exec()
+		})
+		.then(media=> {
+			media.taggedUserIds.forEach(id => {
+				user_Ids.push(id);
+			})
+			user_Ids.push(media.uploaderUser_Id);
+			return Mailbox.createNotifications(user_Ids, sender, "like", mediaId)
+		})
+		.then(result => {
 			res.status(200).json({ message: "like create success" });
-		}
-	});
-
+		})
+		.catch(err => {
+			res.status(400).json({ message: "like create failure: " + err });
+		})
+	.done();
 }

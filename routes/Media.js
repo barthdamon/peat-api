@@ -11,6 +11,8 @@ var User = require('./User.js');
 var Gallery = require('./Gallery.js');
 var GalleryModel = require('../models/GallerySchema.js');
 
+var Mailbox = require('./Mailbox.js');
+
 
 exports.postMedia = function(req, res) {
 	createMedia(req)
@@ -78,15 +80,40 @@ exports.updateMedia = function(req, res) {
 		updateUserGalleryWithMedia(mediaId, user_Id);
 	}
 
-	Media.update({ mediaId: mediaId }, mediaObject).exec()
+	var previouslyTagged = [];
+
+	// do a diff with the tagged users (figure out if any new ones are tagged)
+	Media.find({ mediaId: mediaId }).exec()
+		.then(media => {
+			media.taggedUser_Ids.forEach(id => {
+				previouslyTagged.push(id);
+			})
+			return Media.update({ mediaId: mediaId }, mediaObject).exec()
+		})
 		.then(function(result){
 			console.log("Media Updated");
+			req.taggedIds = mediaObject.taggedUser_Ids;
 			if (mediaObject.taggedUser_Ids) {
 				var action = mediaObject.taggedUser_Ids.map(galleryUpd);
 				return Promise.promisifyAll(action, {multiArgs: true})
 			} else {
 				return Promise.resolve();
 			}
+		})
+		.then(function(result){
+			var needsNotifying = [];
+			req.taggedIds.forEach(id => {
+				var previous = true
+				previouslyTagged.forEach(tagged => {
+					if (tagged == id) {
+						previous = false
+					}
+				})
+				if (!previous) {
+					needsNotifying.push(id);
+				}
+			});
+			return Mailbox.createNotifications(user_Ids, req.body.user._id, "tag", mediaId)
 		})
 		.then(function(result){
 			res.status(200).status({message: "Media Updated"});

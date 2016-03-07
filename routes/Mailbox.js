@@ -14,32 +14,39 @@ var Media = require('./Media.js');
 
 var Notification = require('./../models/NotificationSchema.js');
 
+function createNotification(userToNotify_Id, userNotifying_Id, type, mediaId) {
+	return new Promise(function(resolve, reject) {
+		var currentTime = Date.now();
+		//leaf.update
+		//User has to be one of the other users friends though
+		var newNotification = new Notification({
+			userToNotify_Id: userToNotify_Id,
+			userNotifying_Id: userNotifying_Id,
+			seen: false,
+			type: type,
+			mediaId: mediaId,
+			timestamp: currentTime
+		});
+
+		newNotification.save()
+			.then(notification => {
+				resolve(notification);
+				// TODO: After creation, alert the push notification service! (tbcreated)
+			})
+			.catch(err => {
+				reject(err);
+			})
+		.done();
+	});
+}
 
 module.exports = {
-	createNotification: (userToNotify_Id, userNotifying_Id, type, mediaId) => {
-		return new Promise(function(resolve, reject) {
-			var currentTime = Date.now();
-			//leaf.update
-			//User has to be one of the other users friends though
-			var newNotification = new Notification({
-				userToNotify_Id: userToNotify_Id,
-				userNotifying_Id: userNotifying_Id,
-				seen: false,
-				type: type,
-				mediaId: mediaId,
-				timestamp: currentTime
-			});
-
-			newNotification.save()
-				.then(notification => {
-					resolve(notification);
-					// TODO: After creation, alert the push notification service! (tbcreated)
-				})
-				.catch(err => {
-					reject(err);
-				})
-			.done();
-		});
+	createNotifications: (usersToNotify_Ids, userNotifying_Id, type, mediaId) => {
+		var notify = function notifyUser(user_Id) {
+			createNotification(user_Id, userNotifying_Id, type, mediaId);
+		}
+		let action = usersToNotify_Ids.map(notify);
+		return Promise.promisifyAll(action, {multiArgs: true});
 	},
 
 	markNotificationsSeen: (req, res) => {

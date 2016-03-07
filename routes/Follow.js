@@ -25,7 +25,7 @@ exports.newFollow = function(req, res) {
 
 	newFollow.save()
 		.then(follow => {
-			return Mailbox.createNotification(following, follower, "follow", null)
+			return Mailbox.createNotifications([following], follower, "follow", null)
 		})
 		.then(notification => {
 			res.status(200).json({message: "Follow created Successfully"});
