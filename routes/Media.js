@@ -34,6 +34,7 @@ function createMedia(req) {
 		let mediaId = req.body.mediaId;
 		let ability_Id = req.body.ability_Id;
 		let taggedUser_Ids = req.body.taggedUser_Ids;
+		let uploaderUser_Id = req.body.uploaderUser_Id;
 
 		//For each variationId on the medias variations array check if there is a variation with the variationId. If not, create it with a custom field of true.
 		//Then post the media with the variations array of the request, assuming the variations on the request are all created or valid (are found)
@@ -43,7 +44,7 @@ function createMedia(req) {
 		var postedMedia = new Media({
 			mediaId: mediaId,
 			leafId: leafId,
-			uploaderUser_Id: req.user._id,
+			uploaderUser_Id: uploaderUser_Id,
 			taggedUser_Ids: taggedUser_Ids,
 			ability_Id: ability_Id,
 			source: {
@@ -59,7 +60,14 @@ function createMedia(req) {
 		postedMedia.save()
 			.then(function(result){
 				console.log("Media Created");
-				resolve();		
+				if (req.user._Id != uploaderUser_Id) {
+					Mailbox.createNotifications([uploaderUser_Id], req.user._id, "repost", mediaId)
+				} else {
+					return Promise.resolve(null);
+				}
+			})
+			.then(result => {
+				resolve();	
 			})
 			.catch(function(err){
 				reject(err);
@@ -113,7 +121,7 @@ exports.updateMedia = function(req, res) {
 					needsNotifying.push(id);
 				}
 			});
-			return Mailbox.createNotifications(user_Ids, req.body.user._id, "tag", mediaId)
+			return Mailbox.createNotifications(user_Ids, req.user._id, "tag", mediaId)
 		})
 		.then(function(result){
 			res.status(200).status({message: "Media Updated"});
