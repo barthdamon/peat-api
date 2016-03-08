@@ -30,9 +30,11 @@ exports.createComment = function(req, res) {
 			return Media.findOne({mediaId: req.body.mediaId }).exec()
 		})
 		.then(media=> {
-			media.taggedUserIds.forEach(id => {
-				user_Ids.push(id);
-			})
+			if (media.taggedUserIds != null) {
+				media.taggedUserIds.forEach(id => {
+					user_Ids.push(id);
+				})
+			}
 			user_Ids.push(media.uploaderUser_Id);
 			return Comment.find({ mediaId: req.body.mediaId }).exec()
 		})
@@ -42,7 +44,9 @@ exports.createComment = function(req, res) {
 					user_Ids.push(comment.sender);
 				}
 			})
-			return Mailbox.createNotifications(user_Ids, sender, "comment", mediaId)
+			let ids = user_Ids.filter(id => { if (id != null) { return id } });
+			console.log("Creating notifications for " + JSON.stringify(ids));
+			return Mailbox.createNotifications(ids, sender, "comment", req.body.mediaId, null)
 		})
 		.then(result => {
 			res.status(200).json({ message: "comment create success" });
@@ -75,7 +79,7 @@ exports.newLike = function(req, res) {
 				user_Ids.push(id);
 			})
 			user_Ids.push(media.uploaderUser_Id);
-			return Mailbox.createNotifications(user_Ids, sender, "like", mediaId)
+			return Mailbox.createNotifications(user_Ids, sender, "like", mediaId, null)
 		})
 		.then(result => {
 			res.status(200).json({ message: "like create success" });

@@ -9,6 +9,7 @@ var Witness = require('./../models/WitnessSchema.js');
 var Media = require('./Media.js');
 var Ability = require('./../models/AbilitySchema.js');
 var Activity = require('./../models/ActivitySchema.js');
+var User = require('./User.js');
 
 exports.newLeaf = function(req, res) {
 	let currentTime = Date.now();
@@ -67,6 +68,42 @@ function abilityCheck(id, abilityName, activityName) {
 	});
 }
 
+exports.generateLeafData = generateLeafData;
+function generateLeafData(leafId) {
+	console.log("Generating leaf data");
+	return new Promise(function(resolve, reject) {
+		Leaf.findOne({ leafId: leafId }).exec()
+			.then(function(leaf){
+				leafInfo.leaf = leaf;
+				return Witness.find({leafId: leafId}).exec()
+			})
+			.then(function(witnesses){
+				leafInfo.witnesses = witnesses;
+				var userIds = witness.map(witness => { return witness.witness_Id });
+				return User.userProfilesForIds(ids)
+			})
+			.then(userInfo => {
+				leafInfo.witnesses.forEach(witness => {
+					userInfo.users.forEach(user => {
+						if (witness.witness_Id = user._id) {
+							witness._doc.witnessUser = user;
+						}
+					})
+				})
+				return Media.getMediaWithQuery({leafId: leafId})
+			})
+			.then(function(mediaInfo){
+				leafInfo.mediaInfo = mediaInfo;
+				resolve(leafInfo);
+			})
+			.catch(function(err){
+				console.log("Error generating leaf data: " + err);
+				reject(err);
+			})
+		.done();
+	});
+}
+
 //returns all the media, coments, and witness events for the leaf (the contents for the drilldown)
 exports.getLeafData = function(req, res) {
 	let leafId = req.params.leafId;
@@ -74,26 +111,14 @@ exports.getLeafData = function(req, res) {
 
 	var leafInfo = {mediaInfo:{}};
 
-	Leaf.findOne({ user_Id: user_Id, leafId: leafId }).exec()
-		.then(function(leaf){
-			leafInfo.leaf = leaf;
-			return Witness.find({leafId: leafId}).exec()
-		})
-		.then(function(witnesses){
-			leafInfo.witnesses = witnesses;
-			console.log("Searching media with leafId: " +leafId + ", user_Id: " + user_Id);
-			return Media.getMediaWithQuery({leafId: leafId})
-		})
-		.then(function(mediaInfo){
-			leafInfo.mediaInfo = mediaInfo;
+	generateLeafData(leafId)
+		.then(leafInfo => {
 			res.status(200).json(leafInfo);
 		})
-		.catch(function(err){
-			console.log("Error generating leaf data: " + err);
+		.catch(err => {
 			res.status(400).json({message : "Error generating leaf data: " +err});
 		})
 	.done();
-
 }
 
 exports.updateLeaf = function(req, res) {

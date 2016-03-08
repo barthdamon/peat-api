@@ -61,7 +61,7 @@ function createMedia(req) {
 			.then(function(result){
 				console.log("Media Created");
 				if (req.user._Id != uploaderUser_Id) {
-					Mailbox.createNotifications([uploaderUser_Id], req.user._id, "repost", mediaId)
+					Mailbox.createNotifications([uploaderUser_Id], req.user._id, "repost", mediaId, null)
 				} else {
 					return Promise.resolve(null);
 				}
@@ -121,7 +121,7 @@ exports.updateMedia = function(req, res) {
 					needsNotifying.push(id);
 				}
 			});
-			return Mailbox.createNotifications(user_Ids, req.user._id, "tag", mediaId)
+			return Mailbox.createNotifications(user_Ids, req.user._id, "tag", mediaId, null)
 		})
 		.then(function(result){
 			res.status(200).status({message: "Media Updated"});

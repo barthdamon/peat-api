@@ -17,6 +17,7 @@ var notificationSchema = mongoose.Schema({
 	seen: Boolean,
 	type: String,
 	mediaId: String,
+	leafId: String,
 	timestamp: Number
 });
 

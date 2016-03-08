@@ -11,10 +11,10 @@ var Witness = require('./../models/WitnessSchema.js');
 var User = require('./User.js');
 var UserModel = require('./../models/UserSchema.js');
 var Media = require('./Media.js');
-
+var Leaf = require('./Leaf.js');
 var Notification = require('./../models/NotificationSchema.js');
 
-function createNotification(userToNotify_Id, userNotifying_Id, type, mediaId) {
+function createNotification(userToNotify_Id, userNotifying_Id, type, mediaId, leafId) {
 	return new Promise(function(resolve, reject) {
 		var currentTime = Date.now();
 		//leaf.update
@@ -25,6 +25,7 @@ function createNotification(userToNotify_Id, userNotifying_Id, type, mediaId) {
 			seen: false,
 			type: type,
 			mediaId: mediaId,
+			leafId: leafId,
 			timestamp: currentTime
 		});
 
@@ -41,9 +42,9 @@ function createNotification(userToNotify_Id, userNotifying_Id, type, mediaId) {
 }
 
 module.exports = {
-	createNotifications: (usersToNotify_Ids, userNotifying_Id, type, mediaId) => {
+	createNotifications: (usersToNotify_Ids, userNotifying_Id, type, mediaId, leafId) => {
 		var notify = function notifyUser(user_Id) {
-			createNotification(user_Id, userNotifying_Id, type, mediaId);
+			createNotification(user_Id, userNotifying_Id, type, mediaId, leafId);
 		}
 		let action = usersToNotify_Ids.map(notify);
 		return Promise.promisifyAll(action, {multiArgs: true});
@@ -89,20 +90,39 @@ module.exports = {
 					})
 					//get userId
 					userIds.push(notification.userNotifying_Id);
-				});		
-				return User.userProfilesForIds(userIds)			
+				});	
+				return User.userProfilesForIds(userIds)	
 			})
 			.then(users => {
 				console.log("Users for notifications found: " + JSON.stringify(users));
-				let notifications = req.notifications != null ? req.notifications : [] ;
-				notifications.forEach(notification => {
+				var leafIds = [];
+				req.notifications.forEach(notification => {
+					leafIds.push(notification.leafId);
 					users.forEach(user => {
 						if (notification.userNotifying_Id == user.userInfo._id) {
 							notification._doc.userNotifying = user.userInfo;
 						}
 					})
-				});					
-				res.status(200).json({ notifications: notifications });
+				});
+
+				var leafInfo = function getInfo(leafId) {
+					Leaf.generateLeafData(leafId);
+				}
+
+				let action = leafIds.map(leafInfo);
+				return Promise.promisifyAll(action, {multiArgs: true})			
+			})
+			.then(leaves => {
+				leaves.forEach(leaf => {
+					req.notifications.forEach(notification => {
+						if (notification.leafId != null) {
+							if (notification.leafId == leaf.leafId) {
+								notification._doc.leafInfo = leaf;
+							}
+						}
+					});
+				})
+				res.status(200).json({ notifications: req.notifications });
 			})
 			.catch(err => {
 				console.log("Error fetching notifications: " + err);

@@ -10,6 +10,8 @@ var Witness = require('./../models/WitnessSchema.js');
 var User = require('./User.js');
 var UserModel = require('./../models/UserSchema.js');
 
+var Mailbox = require('./Mailbox.js');
+
 exports.createWitness = function(req, res) {
 	let witness = req.user._id;
 	let witnessed = req.body.witnessed_Id;
@@ -25,13 +27,17 @@ exports.createWitness = function(req, res) {
 
 	console.log("new witness: " + newWitness);
 
-	newWitness.save(function(err) {
-		if (err) {
-			res.status(400).json({ message: "witness create failure: " + err });
-		} else {
+	newWitness.save()
+		.then(witness => {
+			Mailbox.createNotifications([witnessed_Id], witness_Id, "witness", null, leafId)
+		})
+		.then(result => {
 			res.status(200).json({ message: "witness create success" });
-		}
-	});
+		})
+		.catch(err => {
+			res.status(400).json({ message: "witness create failure: " + err });
+		})
+	.done();
 }
 
 // exports.confirmWitness = function(req, res) {
