@@ -71,6 +71,9 @@ function abilityCheck(id, abilityName, activityName) {
 exports.generateLeafData = generateLeafData;
 function generateLeafData(leafId) {
 	console.log("Generating leaf data");
+
+	var leafInfo = {mediaInfo:{}};
+
 	return new Promise(function(resolve, reject) {
 		Leaf.findOne({ leafId: leafId }).exec()
 			.then(function(leaf){
@@ -79,8 +82,8 @@ function generateLeafData(leafId) {
 			})
 			.then(function(witnesses){
 				leafInfo.witnesses = witnesses;
-				var userIds = witness.map(witness => { return witness.witness_Id });
-				return User.userProfilesForIds(ids)
+				var userIds = witnesses.map(witness => { return witness.witness_Id });
+				return User.userProfilesForIds(userIds)
 			})
 			.then(userInfo => {
 				leafInfo.witnesses.forEach(witness => {
@@ -108,8 +111,6 @@ function generateLeafData(leafId) {
 exports.getLeafData = function(req, res) {
 	let leafId = req.params.leafId;
 	let user_Id = req.user._id;
-
-	var leafInfo = {mediaInfo:{}};
 
 	generateLeafData(leafId)
 		.then(leafInfo => {
