@@ -11,8 +11,8 @@ var groupingSchema = mongoose.Schema({
 	groupingId: String,
 	name: String,
 	colorString: String,
-	width: String,
-	height: String,
+	width: Number,
+	height: Number,
 	layout: {
 		coordinates: {
 			x: Number,

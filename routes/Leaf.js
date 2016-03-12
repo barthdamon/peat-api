@@ -34,12 +34,12 @@ exports.newLeaf = function(req, res) {
 					activityName: req.body.activityName,
 					ability_Id: req.ability_Id,
 					leafId: req.body.leafId,
+					groupingId: req.body.groupingId,
 					layout: {
 						coordinates: {
 							x: req.body.layout.coordinates.x,
 							y: req.body.layout.coordinates.y
-						},
-						groupingId: req.body.layout.grouping
+						}
 					},
 					completionStatus: req.body.completionStatus,
 					abilityName: req.body.abilityName,

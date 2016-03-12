@@ -11,12 +11,12 @@ var leafSchema = mongoose.Schema({
 	activityName: String,
 	ability_Id: String,
 	leafId: String,
+	groupingId: String,
 	layout: {
 		coordinates: {
 			x: Number,
 			y: Number
-		},
-		groupingId: String
+		}
 	},
 	completionStatus: String,
 	abilityName: String,
