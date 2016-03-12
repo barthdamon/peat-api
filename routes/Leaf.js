@@ -112,8 +112,9 @@ function generateLeafData(leafIds) {
 				leafInfo.forEach(leaf=> {
 					leaf._doc.mediaInfo = [];
 					mediaInfo.media.forEach(media=> {
-						if (media.leafId == leaf.media) {
+						if (media.leafId == leaf.leafId) {
 							leaf._doc.mediaInfo.push(media);
+							console.log("MEDIA PUSHED ONTO LEAF");
 						}
 					})
 				});
