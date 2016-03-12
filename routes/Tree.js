@@ -6,6 +6,7 @@ var Promise = require('bluebird');
 
 var Activity = require('./../models/ActivitySchema.js');
 var Leaf = require('./../models/LeafSchema.js');
+var LeafRoute = require('./Leaf.js');
 var Connection = require('./../models/ConnectionSchema.js');
 var Grouping = require('./../models/GroupingSchema.js');
 
@@ -24,6 +25,20 @@ exports.getTree = function(req, res) {
 		})
 		.then(function(leaves){
 			req.leaves = leaves
+			var leafIds = [];
+			leaves.forEach(leaf=> {
+				leafIds.push(leaf.leafId);
+			})
+			return LeafRoute.generateLeafData(leafIds)
+		})
+		.then(function(leafData){
+			leafData.forEach(data=> {
+				req.leaves.forEach(leaf=> {
+					if (leaf.leafId == data.leafId) {
+						leaf._doc.contents = data;
+					}
+				})
+			})
 			return Connection.find({user_Id: user_Id, activityName: activityName}).exec()
 		})
 		.then(function(connections){

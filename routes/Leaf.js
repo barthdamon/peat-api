@@ -69,34 +69,54 @@ function abilityCheck(id, abilityName, activityName) {
 }
 
 exports.generateLeafData = generateLeafData;
-function generateLeafData(leafId) {
+function generateLeafData(leafIds) {
 	console.log("Generating leaf data");
 
-	var leafInfo = {mediaInfo:{}};
+	var leafInfo = [];
+	var witnesses = [];
 
 	return new Promise(function(resolve, reject) {
-		Leaf.findOne({ leafId: leafId }).exec()
-			.then(function(leaf){
-				leafInfo.leaf = leaf;
-				return Witness.find({leafId: leafId}).exec()
+		Leaf.find({ leafId: { $in: leafIds }}).exec()
+			.then(function(leaves){
+				leafInfo = leaves;
+				return Witness.find({leafId: {$in:leafIds}}).exec()
 			})
 			.then(function(witnesses){
-				leafInfo.witnesses = witnesses;
+				witnesses = witnesses;
 				var userIds = witnesses.map(witness => { return witness.witness_Id });
 				return User.userProfilesForIds(userIds)
+
 			})
 			.then(userInfo => {
-				leafInfo.witnesses.forEach(witness => {
+				//attach users to the witnesses
+				witnesses.forEach(witness => {
 					userInfo.users.forEach(user => {
 						if (witness.witness_Id = user._id) {
 							witness._doc.witnessUser = user;
 						}
 					})
 				})
-				return Media.getMediaWithQuery({leafId: leafId})
+				//attach witnesses to the leaves
+				leafInfo.forEach(leaf => {
+					leaf._doc.witnesses = [];
+					witnesses.forEach(witness => {
+						if (leaf.leafId = witness.leafId) {
+							leaf._doc.witnesses.push(witness);
+						}
+					})
+				});
+				return Media.getMediaWithQuery({leafId: {$in: leafIds}})
 			})
 			.then(function(mediaInfo){
-				leafInfo.mediaInfo = mediaInfo;
+				console.log("MEDIA INFO:" + JSON.stringify(mediaInfo));
+				leafInfo.forEach(leaf=> {
+					leaf._doc.mediaInfo = [];
+					mediaInfo.media.forEach(media=> {
+						if (media.leafId == leaf.media) {
+							leaf._doc.mediaInfo.push(media);
+						}
+					})
+				});
 				resolve(leafInfo);
 			})
 			.catch(function(err){
@@ -112,9 +132,9 @@ exports.getLeafData = function(req, res) {
 	let leafId = req.params.leafId;
 	let user_Id = req.user._id;
 
-	generateLeafData(leafId)
+	generateLeafData([leafId])
 		.then(leafInfo => {
-			res.status(200).json(leafInfo);
+			res.status(200).json(leafInfo[0]);
 		})
 		.catch(err => {
 			res.status(400).json({message : "Error generating leaf data: " +err});
