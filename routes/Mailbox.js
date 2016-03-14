@@ -65,9 +65,9 @@ module.exports = {
 
 //should be mapping the objects to attach whatever they need attached to them #es6Bitch
 	getNotifications: (req, res) => {
-		let id = req.user._id;
-		console.log(`Generating notifications for ${id}`);
-		Notification.find({ userToNotify_Id: req.user._id }).sort( { timestamp: -1 } ).limit(10).exec()
+		let user_Id = req.user._id;
+		console.log(`Generating notifications for ${user_Id}`);
+		Notification.find({ userToNotify_Id: user_Id, userNotifying_Id: {$ne: user_Id} }).sort( { timestamp: -1 } ).limit(10).exec()
 			.then(notifications => {
 				req.notifications = notifications;
 				console.log("Notifications found: " + JSON.stringify(notifications));

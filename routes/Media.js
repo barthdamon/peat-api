@@ -166,6 +166,7 @@ exports.getMediaWithQuery = function(query) {
 						user_Ids.push(id);
 					})
 				});
+				//TODO: limit this and then have  a get more comments route
 				return Comment.find({$query: {mediaId: {$in: mediaIds}}, $orderby: { timestamp : -1 }}).exec()
 			})
 			.then(function(comments){

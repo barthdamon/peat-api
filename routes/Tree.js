@@ -32,6 +32,7 @@ exports.getTree = function(req, res) {
 			return LeafRoute.generateLeafData(leafIds)
 		})
 		.then(function(leafData){
+			console.log("LEAF DATA: "+ JSON.stringify(leafData));
 			leafData.forEach(data=> {
 				req.leaves.forEach(leaf=> {
 					if (leaf.leafId == data.leafId) {
@@ -133,7 +134,7 @@ exports.saveTree = function(req, res) {
 			}
 		})
 		.then(function(){
-									console.log("here7");
+									console.log("Grouping Updates: " + groupingUpdates);
 			let action = groupingUpdates.map(groupingUpd);
 			return Promise.promisifyAll(action, {multiArgs: true})
 		})

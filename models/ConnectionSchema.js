@@ -13,6 +13,14 @@ var connectionSchema = mongoose.Schema({
 	type: String,
 	toId: String,
 	fromId: String,
+	toObjectPoint: {
+		x: Number,
+		y: Number
+	},
+	fromObjectPoint: {
+		x: Number,
+		y: Number
+	}
 });
 
 mongoose.model('Connection', connectionSchema);
