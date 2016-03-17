@@ -27,7 +27,7 @@ function addMediaToGallery(req) {
 		MediaRoute.createMedia(req)
 			.then(function(result){
 				console.log("Media created for gallery");
-				return Gallery.update({user_Id: req.user._id}, {$addToSet: {mediaIds: req.body.mediaId}}).exec()
+				return Gallery.update({$or: [{ user_Id: req.user._id }, {user_Id: {$in: req.body.taggedUser_Ids} }]}, {$addToSet: {mediaIds: req.body.mediaId}}).exec()
 			})
 			.then(function(result){
 				console.log("Gallery updated");
@@ -50,6 +50,7 @@ exports.getGallery = function(req, res) {
 			gallery.mediaIds.forEach(function(id){
 				mediaIds.push(id);
 			})
+			console.log("Found gallery");
 			return MediaRoute.getMediaWithQuery({mediaId: {$in: mediaIds}})
 		})
 		.then(function(mediaInfo){

@@ -157,7 +157,7 @@ exports.getMediaWithQuery = function(query) {
 
 		Media.find(query).sort( { timestamp: -1 } ).limit(5).exec()
 			.then(function(media){
-				console.log("MEDIA FOUND: " + JSON.stringify(media));
+				console.log("MEDIA FOUND: " + media.length);
 				mediaInfo.media = media;
 				media.forEach(function(media){
 					mediaIds.push(media.mediaId);
@@ -240,7 +240,7 @@ exports.getMediaWithQuery = function(query) {
 						}
 					})
 				})
-				console.log("MEDIA SENT: " + JSON.stringify(mediaInfo));
+				console.log("MEDIA RETURNED FROM QUERY");
 				resolve(mediaInfo);
 			})
 			.catch(function(err){
